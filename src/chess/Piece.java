@@ -1,6 +1,5 @@
-package chess.piece;
+package chess;
 
-import chess.*;
 import java.util.List;
 
 public abstract class Piece {
@@ -13,7 +12,7 @@ public abstract class Piece {
     public Piece(Team team) {
         this.team = team;
     }
-
+    
     @Override
     public abstract String toString();
     

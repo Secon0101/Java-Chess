@@ -1,6 +1,6 @@
-package chess.piece;
+package chess;
 
-import chess.*;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Pawn extends Piece {
@@ -15,6 +15,8 @@ public class Pawn extends Piece {
     
     @Override
     public List<Position> getMovement() {
-        return null;
+        List<Position> movement = new LinkedList<Position>();
+        movement.add(new Position(0, 1));
+        return movement;
     }
 }
