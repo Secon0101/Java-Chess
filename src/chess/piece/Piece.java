@@ -1,6 +1,7 @@
 package chess.piece;
 
-import chess.Team;
+import chess.*;
+import java.util.List;
 
 public abstract class Piece {
     protected Team team;
@@ -12,4 +13,9 @@ public abstract class Piece {
     public Piece(Team team) {
         this.team = team;
     }
+
+    @Override
+    public abstract String toString();
+    
+    public abstract List<Position> getMovement();
 }
