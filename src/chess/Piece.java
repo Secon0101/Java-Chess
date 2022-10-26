@@ -1,5 +1,0 @@
-package chess;
-
-interface Piece {
-    
-}
