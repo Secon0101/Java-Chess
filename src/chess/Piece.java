@@ -17,7 +17,10 @@ public abstract class Piece {
     }
     
     
+    /** 현재 기물이 움직일 수 있는 모든 위치를 구한다. */
     public abstract List<Position> getMovement();
+    
+    abstract void onMoved();
     
     @Override
     public abstract String toString();
