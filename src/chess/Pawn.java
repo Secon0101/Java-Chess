@@ -4,19 +4,21 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Pawn extends Piece {
-    public Pawn(Team team) {
-        super(team);
+    Pawn(Piece[][] board, Position position, Team team) {
+        super(board, position, team);
     }
-
-    @Override
-    public String toString() {
-        return team == Team.Black ? "♟" : "♙";
-    }
+    
     
     @Override
     public List<Position> getMovement() {
-        List<Position> movement = new LinkedList<Position>();
-        movement.add(new Position(0, 1));
-        return movement;
+        // 임시
+        return new LinkedList<>(List.of(
+            new Position(0, 3)
+        ));
+    }
+    
+    @Override
+    public String toString() {
+        return team == Team.Black ? "♟" : "♙";
     }
 }
