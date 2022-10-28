@@ -16,9 +16,16 @@ public class Position {
         return new Position(this.x + x, this.y + y);
     }
     
+    public boolean in(Position rect) {
+        return 0 <= x && x < rect.x && 0 <= y && y < rect.y;
+    }
+    public boolean in(int x, int y) {
+        return 0 <= this.x && this.x < x && 0 <= this.y && this.y < y;
+    }
+    
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof Position && ((Position)obj).x == x && ((Position)obj).y == y;
+        return obj instanceof Position pos && pos.x == x && pos.y == y;
     }
     
     @Override

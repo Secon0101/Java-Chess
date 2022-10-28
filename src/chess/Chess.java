@@ -7,15 +7,9 @@ public class Chess {
     private Team turn = Team.White;
     
     
-    public Piece getPiece(int x, int y) {
-        return board[y][x];
-    }
-    public Piece getPiece(Position pos) {
-        return getPiece(pos.x, pos.y);
-    }
-    private void setPiece(Position pos, Piece piece) {
-        board[pos.y][pos.x] = piece;
-    }
+    public Piece getPiece(int x, int y) { return board[y][x]; }
+    public Piece getPiece(Position pos) { return getPiece(pos.x, pos.y); }
+    private void setPiece(Position pos, Piece piece) { board[pos.y][pos.x] = piece; }
     
     public Team getTurn() { return turn; }
     
@@ -34,14 +28,16 @@ public class Chess {
     
     
     /** 말을 from 위치에서 to 위치로 이동시킨다. 그리고 턴을 상대방에게 넘긴다.
-     *  @return 이동에 성공했으면 true, 실패했으면 false */
-    public boolean move(Position from, Position to) throws IllegalStateException, NullPointerException {
+     *  @return 이동 성공 여부 */
+    public MovementResult move(Position from, Position to) {
         if (!isPlaying)
-            throw new IllegalStateException("게임이 시작되지 않았습니다.");
+            return MovementResult.GameNotStarted;
+        if (!from.in(8, 8) || !to.in(8, 8))
+            return MovementResult.InvalidPosition;
         if (getPiece(from) == null)
-            throw new NullPointerException("움직일 기물이 없습니다.");
+            return MovementResult.NoPiece;
         if (getPiece(from).getTeam() != turn)
-            throw new IllegalStateException("상대방의 턴입니다.");
+            return MovementResult.NotYourTurn;
         
         Piece piece = getPiece(from);
         setPiece(to, piece);
@@ -51,6 +47,14 @@ public class Chess {
         
         turn = piece.getTeam() == Team.White ? Team.Black : Team.White;
         
-        return true;
+        return MovementResult.Succeed;
+    }
+    
+    private enum MovementResult {
+        Succeed,
+        GameNotStarted,
+        InvalidPosition,
+        NoPiece,
+        NotYourTurn,
     }
 }
