@@ -9,16 +9,19 @@ public class Chess {
     
     public Piece getPiece(int x, int y) { return board[y][x]; }
     public Piece getPiece(Position pos) { return getPiece(pos.x, pos.y); }
-    private void setPiece(Position pos, Piece piece) { board[pos.y][pos.x] = piece; }
+    private void setPiece(int x, int y, Piece piece) { board[y][x] = piece; }
+    private void setPiece(Position pos, Piece piece) { setPiece(pos.x, pos.y, piece); }
     
     public Team getTurn() { return turn; }
     
     
     public Chess() {
-        for (int i = 0; i < 8; i++)
-            board[6][i] = new Pawn(board, new Position(i, 6), Team.Black);
-        for (int i = 0; i < 8; i++)
-            board[1][i] = new Pawn(board, new Position(i, 1), Team.White);
+        setPiece(4, 0, new King(board, new Position(0, 4), Team.White));
+        setPiece(4, 7, new King(board, new Position(7, 4), Team.Black));
+        for (int i = 0; i < 8; i++) {
+            setPiece(i, 1, new Pawn(board, new Position(i, 1), Team.White));
+            setPiece(i, 6, new Pawn(board, new Position(i, 6), Team.Black));
+        }
     }
     
     /** 로컬 멀티플레이 게임을 시작한다. */

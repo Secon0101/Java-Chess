@@ -21,7 +21,4 @@ public abstract class Piece {
     public abstract List<Position> getMovement();
     
     abstract void onMoved();
-    
-    @Override
-    public abstract String toString();
 }
