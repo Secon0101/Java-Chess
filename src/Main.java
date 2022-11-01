@@ -1,9 +1,9 @@
 import chess.*;
-
 import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
+        new MyFrame();
         Chess chess = new Chess();
         chess.play();
         
