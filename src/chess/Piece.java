@@ -2,23 +2,26 @@ package chess;
 
 import java.util.List;
 
-public abstract class Piece {
-    protected Piece[][] board;
-    protected Position pos;
-    protected Team team;
+abstract class Piece {
+    protected final Chess chess;
+    protected final Team team;
+    protected Position position;
+    protected List<Position> moves;
     
-    public Team getTeam() { return team; }
     
-    
-    Piece(Piece[][] board, Position position, Team team) {
-        this.board = board;
-        pos = position;
+    Piece(Chess chess, Team team, Position position) {
+        this.chess = chess;
         this.team = team;
+        this.position = position;
     }
     
+    void setPosition(Position pos) {
+        position = pos;
+    }
     
-    /** 현재 기물이 움직일 수 있는 모든 위치를 구한다. */
-    public abstract List<Position> getMovement();
+    List<Position> getMoves() {
+        return moves;
+    }
     
-    abstract void onMoved();
+    abstract void calculateMoves();
 }
