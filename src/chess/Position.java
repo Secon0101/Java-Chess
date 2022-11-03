@@ -20,4 +20,11 @@ class Position {
         Position other = (Position) obj;
         return other.x == x && other.y == y;
     }
+    
+    public Position add(Position other) {
+        return new Position(x + other.x, y + other.y);
+    }
+    public Position multiply(int n) {
+        return new Position(x * n, y * n);
+    }
 }
