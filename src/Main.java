@@ -4,7 +4,6 @@ public class Main {
     public static void main(String[] args) {
         Chess chess = new Chess();
 
-        MyFrame frame = new MyFrame();
-        frame.myChess = chess;
+        MyFrame frame = new MyFrame(chess);
     }
 }

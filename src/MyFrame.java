@@ -15,7 +15,7 @@ public class MyFrame extends JFrame implements MouseListener {
     Color backCol;
     Chess myChess;
 
-    MyFrame() {
+    MyFrame(Chess chess) {
 
         pieces[0] = new ImageIcon("res/images/PB.png");
         pieces[1] = new ImageIcon("res/images/RB.png");
@@ -52,10 +52,10 @@ public class MyFrame extends JFrame implements MouseListener {
 
                 njp.setBackground(blankCol);
                 JLabel jl = new JLabel(j +"," + i);
-                if(myChess.getPiece(j,i) instanceof Pawn)
+                if(chess.getPiece(j,i) instanceof Pawn)
                 {
                     int plusIndex = 0;
-                    if(myChess.getPiece(j,i).getTeam() == Team.WHITE)
+                    if(chess.getPiece(j,i).getTeam() == Team.WHITE)
                     {
                         plusIndex = 5;
                     }
