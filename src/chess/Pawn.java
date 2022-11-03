@@ -14,8 +14,8 @@ public class Pawn extends Piece {
         super.calculateMoves();
         
         Position pos = position.add(forward);
-        if (chess.getPiece(pos) == null) {
-            addMove(pos);
+        if (chess.inBoard(pos) && chess.getPiece(pos) == null) {
+            moves.add(pos);
         }
     }
 }

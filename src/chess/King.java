@@ -14,8 +14,8 @@ public class King extends Piece {
                 if (dx == 0 && dy == 0) continue;
                 
                 Position pos = new Position(position.x + dx, position.y + dy);
-                if (chess.getPiece(pos) == null || chess.getPiece(pos).getTeam() != team) {
-                    addMove(pos);
+                if (chess.inBoard(pos) && (chess.getPiece(pos) == null || chess.getPiece(pos).getTeam() != team)) {
+                    moves.add(pos);
                 }
             }
         }

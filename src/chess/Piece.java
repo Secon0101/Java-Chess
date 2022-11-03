@@ -23,11 +23,6 @@ public abstract class Piece {
     public List<Position> getMoves() {
         return moves;
     }
-    protected void addMove(Position pos) {
-        if (chess.inBoard(pos)) {
-            moves.add(pos);
-        }
-    }
     void setPosition(Position pos) {
         position = pos;
     }

@@ -13,12 +13,9 @@ public class Rook extends Piece {
             Position.up, Position.down, Position.left, Position.right
         }) {
             Position pos = position.add(dir);
-            while (chess.inBoard(pos)) {
-                System.out.println("while");
-                if (chess.getPiece(pos) == null || chess.getPiece(pos).getTeam() != team) {
-                    addMove(pos);
-                }
-                pos = position.add(dir);
+            while (chess.inBoard(pos) && (chess.getPiece(pos) == null || chess.getPiece(pos).getTeam() != team)) {
+                moves.add(pos);
+                pos = pos.add(dir);
             }
         }
     }
