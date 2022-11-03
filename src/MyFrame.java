@@ -1,3 +1,7 @@
+import chess.Chess;
+import chess.Pawn;
+import chess.Team;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.GridLayout;
@@ -9,8 +13,10 @@ public class MyFrame extends JFrame implements MouseListener {
 
     ImageIcon[] pieces = new ImageIcon[12];
     Color backCol;
+    Chess myChess;
 
     MyFrame() {
+
         pieces[0] = new ImageIcon("res/images/PB.png");
         pieces[1] = new ImageIcon("res/images/RB.png");
         pieces[2] = new ImageIcon("res/images/NB.png");
@@ -34,11 +40,8 @@ public class MyFrame extends JFrame implements MouseListener {
         jp.setLayout(new GridLayout(8, 8));
         jp.setBackground(Color.darkGray);
 
-        int row = 72;
-
         for (int i = 8; i > 0; i--) {
-            int col = 1;
-            for (int j = 0; j < 8; j++) {
+            for (int j = 1; j <= 8; j++) {
                 Color blankCol = new Color(0, 0, 0);
                 JPanel njp = new JPanel();
 
@@ -48,11 +51,20 @@ public class MyFrame extends JFrame implements MouseListener {
                     blankCol = new Color(0, 0, 0);
 
                 njp.setBackground(blankCol);
+                JLabel jl = new JLabel(j +"," + i);
+                if(myChess.getPiece(j,i) instanceof Pawn)
+                {
+                    int plusIndex = 0;
+                    if(myChess.getPiece(j,i).getTeam() == Team.WHITE)
+                    {
+                        plusIndex = 5;
+                    }
+                    jl.setIcon(pieces[plusIndex + 0]);
+                }
+                njp.add(jl);
                 jp.add(njp);
                 njp.addMouseListener(this);
-                col++;
             }
-            row--;
         }
         add(jp);
         setVisible(true);

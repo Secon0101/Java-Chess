@@ -5,6 +5,6 @@ public class Main {
         Chess chess = new Chess();
 
         MyFrame frame = new MyFrame();
-
+        frame.myChess = chess;
     }
 }
