@@ -4,11 +4,12 @@ public class Chess {
     private final Piece[][] board = new Piece[8][8];
     
     
-    // 왼쪽 아래가 (1, 1), 오른쪽 위가 (8, 8)
-    private Piece getPiece(Position pos) {
+    /** 왼쪽 아래가 (1, 1), 오른쪽 위가 (8, 8) */
+    public Piece getPiece(Position pos) {
         return board[pos.y-1][pos.x-1];
     }
-    private Piece getPiece(int x, int y) {
+    /** 왼쪽 아래가 (1, 1), 오른쪽 위가 (8, 8) */
+    public Piece getPiece(int x, int y) {
         return board[y-1][x-1];
     }
     private void setPiece(Position pos, Piece piece) {
@@ -35,7 +36,8 @@ public class Chess {
     }
     
     
-    /** from 위치에 있는 말을 to 위치로 옮긴다. */
+    /** from 위치에 있는 말을 to 위치로 옮긴다.
+     * @return 이동 성공 여부 + 실패했다면 실패 원인 */
     public MoveResult move(Position from, Position to) {
         if (isOutOfBoard(from) || isOutOfBoard(to))
             return MoveResult.InvalidPosition;
