@@ -39,7 +39,7 @@ public class Chess {
     /** from 위치에 있는 말을 to 위치로 옮긴다.
      * @return 이동 성공 여부 + 실패했다면 실패 원인 */
     public MoveResult move(Position from, Position to) {
-        if (isOutOfBoard(from) || isOutOfBoard(to))
+        if (!inBoard(from) || !inBoard(to))
             return MoveResult.InvalidPosition;
         
         Piece piece = getPiece(from);
@@ -59,8 +59,8 @@ public class Chess {
     
     
     /** 위치(좌표)가 8x8 체스판 밖에 있는지 판단한다. */
-    boolean isOutOfBoard(Position pos) {
-        return !(1 <= pos.x && pos.x <= 8 && 1 <= pos.y && pos.y <= 8);
+    boolean inBoard(Position pos) {
+        return 1 <= pos.x && pos.x <= 8 && 1 <= pos.y && pos.y <= 8;
     }
     
     /** 판 위에 있는 모든 말들의 이동 가능 위치를 계산해서, 그 말에 저장해 놓는다. */
@@ -91,7 +91,7 @@ public class Chess {
                 if (piece == null) {
                     System.out.print("  ");
                 } else {
-                    System.out.print(piece.getTeam() == Team.BLACK ? "B" : "W");
+                    System.out.print(piece.getTeam() == Team.BLACK ? "b" : "w");
                     if (piece instanceof Pawn)
                         System.out.print("P");
                     else if (piece instanceof Rook)
