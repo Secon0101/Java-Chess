@@ -1,6 +1,6 @@
 package chess;
 
-enum Team {
+public enum Team {
     BLACK,
     WHITE,
 }
