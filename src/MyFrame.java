@@ -1,6 +1,4 @@
-import chess.Chess;
-import chess.Pawn;
-import chess.Team;
+import chess.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -57,9 +55,27 @@ public class MyFrame extends JFrame implements MouseListener {
                     int plusIndex = 0;
                     if(chess.getPiece(j,i).getTeam() == Team.WHITE)
                     {
-                        plusIndex = 5;
+                        plusIndex = 6;
                     }
                     jl.setIcon(pieces[plusIndex + 0]);
+                }
+                if(chess.getPiece(j,i) instanceof Rook)
+                {
+                    int plusIndex = 0;
+                    if(chess.getPiece(j,i).getTeam() == Team.WHITE)
+                    {
+                        plusIndex = 6;
+                    }
+                    jl.setIcon(pieces[plusIndex + 1]);
+                }
+                if(chess.getPiece(j,i) instanceof King)
+                {
+                    int plusIndex = 0;
+                    if(chess.getPiece(j,i).getTeam() == Team.WHITE)
+                    {
+                        plusIndex = 6;
+                    }
+                    jl.setIcon(pieces[plusIndex + 5]);
                 }
                 njp.add(jl);
                 jp.add(njp);
