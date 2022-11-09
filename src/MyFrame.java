@@ -28,6 +28,13 @@ public class MyFrame extends JFrame implements MouseListener {
         pieces[10] = new ImageIcon("res/images/QW.png");
         pieces[11] = new ImageIcon("res/images/KW.png");
 
+        for(int i = 0; i < 12; i++)
+        {
+            Image img = pieces[i].getImage();
+            Image changed = img.getScaledInstance(60,60, Image.SCALE_SMOOTH);
+            pieces[i] = new ImageIcon(changed);
+        }
+
         setTitle("첫번째 프레임");
         setSize(500, 500);
         setResizable(false);
@@ -46,7 +53,7 @@ public class MyFrame extends JFrame implements MouseListener {
                 if ((j + (i%2)) % 2 == 0)
                     blankCol = new Color(255, 255, 255);
                 else
-                    blankCol = new Color(0, 0, 0);
+                    blankCol = new Color(100, 100, 100);
 
                 njp.setBackground(blankCol);
                 JLabel jl = new JLabel(j +"," + i);
@@ -58,6 +65,7 @@ public class MyFrame extends JFrame implements MouseListener {
                     if(chess.getPiece(j,i).getTeam() == Team.WHITE)
                     {
                         plusIndex = 6;
+
                     }
                     jl.setIcon(pieces[plusIndex + 0]);
                 }
@@ -69,6 +77,33 @@ public class MyFrame extends JFrame implements MouseListener {
                         plusIndex = 6;
                     }
                     jl.setIcon(pieces[plusIndex + 1]);
+                }
+                if(chess.getPiece(j,i) instanceof Knight)
+                {
+                    int plusIndex = 0;
+                    if(chess.getPiece(j,i).getTeam() == Team.WHITE)
+                    {
+                        plusIndex = 6;
+                    }
+                    jl.setIcon(pieces[plusIndex + 2]);
+                }
+                if(chess.getPiece(j,i) instanceof Bishop)
+                {
+                    int plusIndex = 0;
+                    if(chess.getPiece(j,i).getTeam() == Team.WHITE)
+                    {
+                        plusIndex = 6;
+                    }
+                    jl.setIcon(pieces[plusIndex + 3]);
+                }
+                if(chess.getPiece(j,i) instanceof Queen)
+                {
+                    int plusIndex = 0;
+                    if(chess.getPiece(j,i).getTeam() == Team.WHITE)
+                    {
+                        plusIndex = 6;
+                    }
+                    jl.setIcon(pieces[plusIndex + 4]);
                 }
                 if(chess.getPiece(j,i) instanceof King)
                 {
