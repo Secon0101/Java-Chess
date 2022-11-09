@@ -50,6 +50,8 @@ public class MyFrame extends JFrame implements MouseListener {
 
                 njp.setBackground(blankCol);
                 JLabel jl = new JLabel(j +"," + i);
+                jl.setSize(60,60);
+
                 if(chess.getPiece(j,i) instanceof Pawn)
                 {
                     int plusIndex = 0;
