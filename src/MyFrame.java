@@ -31,7 +31,7 @@ public class MyFrame extends JFrame implements MouseListener {
         for(int i = 0; i < 12; i++)
         {
             Image img = pieces[i].getImage();
-            Image changed = img.getScaledInstance(60,60, Image.SCALE_SMOOTH);
+            Image changed = img.getScaledInstance(50,50, Image.SCALE_SMOOTH);
             pieces[i] = new ImageIcon(changed);
         }
 
@@ -56,7 +56,7 @@ public class MyFrame extends JFrame implements MouseListener {
                     blankCol = new Color(100, 100, 100);
 
                 njp.setBackground(blankCol);
-                JLabel jl = new JLabel(j +"," + i);
+                JLabel jl = new JLabel();
                 jl.setSize(60,60);
 
                 if(chess.getPiece(j,i) instanceof Pawn)
@@ -139,8 +139,7 @@ public class MyFrame extends JFrame implements MouseListener {
     public void mouseEntered(MouseEvent e) {
         JPanel b = (JPanel)e.getSource();
         backCol = b.getBackground();
-        b.setBackground(Color.gray);
-        System.out.println("Entered");
+        b.setBackground(new Color(153,255,102));
     }
     @Override
     public void mouseExited(MouseEvent e) {
