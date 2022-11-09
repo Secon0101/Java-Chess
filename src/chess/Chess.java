@@ -24,12 +24,17 @@ public class Chess {
         // 말 놓기
         for (int y = 8; y >= 1; y -= 7) {
             setPiece(1, y, new Rook(this, y == 8 ? Team.BLACK : Team.WHITE, new Position(1, y)));
+            setPiece(2, y, new Knight(this, y == 8 ? Team.BLACK : Team.WHITE, new Position(2, y)));
+            setPiece(3, y, new Bishop(this, y == 8 ? Team.BLACK : Team.WHITE, new Position(3, y)));
+            setPiece(4, y, new Queen(this, y == 8 ? Team.BLACK : Team.WHITE, new Position(4, y)));
             setPiece(5, y, new King(this, y == 8 ? Team.BLACK : Team.WHITE, new Position(5, y)));
+            setPiece(6, y, new Bishop(this, y == 8 ? Team.BLACK : Team.WHITE, new Position(6, y)));
+            setPiece(7, y, new Knight(this, y == 8 ? Team.BLACK : Team.WHITE, new Position(7, y)));
             setPiece(8, y, new Rook(this, y == 8 ? Team.BLACK : Team.WHITE, new Position(8, y)));
         }
         for (int x = 1; x <= 8; x++) {
-            setPiece(x, 7, new Pawn(this, Team.BLACK, new Position(1, 2)));
-            setPiece(x, 2, new Pawn(this, Team.WHITE, new Position(1, 2)));
+            setPiece(x, 7, new Pawn(this, Team.BLACK, new Position(x, 7)));
+            setPiece(x, 2, new Pawn(this, Team.WHITE, new Position(x, 2)));
         }
         
         calculateMoves();
@@ -37,7 +42,8 @@ public class Chess {
     
     
     /** from 위치에 있는 말을 to 위치로 옮긴다.
-     * @return 이동 성공 여부 + 실패했다면 실패 원인 */
+     * @return 이동 성공 여부 + 실패했다면 실패 원인
+     * @see MoveResult */
     public MoveResult move(Position from, Position to) {
         if (!inBoard(from) || !inBoard(to))
             return MoveResult.InvalidPosition;
@@ -81,9 +87,15 @@ public class Chess {
     public static void main(String[] args) {
         Chess chess = new Chess();
         
-        Position from = new Position(1, 2);
-        Position to = new Position(1, 3);
-        MoveResult result = chess.move(from, to);
+        moveWithResult(chess, 4, 2, 4, 3);
+        moveWithResult(chess, 3, 1, 6, 4);
+        moveWithResult(chess, 5, 7, 5, 6);
+    }
+    
+    private static void moveWithResult(Chess chess, int x1, int y1, int x2, int y2) {
+        System.out.printf("(%d, %d) -> (%d, %d)\n", x1, y1, x2, y2);
+        MoveResult result = chess.move(new Position(x1, y1), new Position(x2, y2));
+        if (result != MoveResult.Success) System.out.println(result);
         
         for (int y = 8; y >= 1; y--) {
             for (int x = 1; x <= 8; x++) {
@@ -98,10 +110,17 @@ public class Chess {
                         System.out.print("R");
                     else if (piece instanceof King)
                         System.out.print("K");
+                    else if (piece instanceof Bishop)
+                        System.out.print("B");
+                    else if (piece instanceof Knight)
+                        System.out.print("N");
+                    else if (piece instanceof Queen)
+                        System.out.print("Q");
                 }
                 System.out.print(" ");
             }
             System.out.println();
         }
+        System.out.println("-----------------------");
     }
 }

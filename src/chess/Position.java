@@ -1,10 +1,11 @@
 package chess;
 
+/** {@code (x, y)} */
 public class Position {
     public int x;
     public int y;
-
-
+    
+    
     public Position(int x, int y) {
         this.x = x;
         this.y = y;
@@ -15,6 +16,10 @@ public class Position {
     public static final Position down = new Position(0, -1);
     public static final Position left = new Position(-1, 0);
     public static final Position right = new Position(1, 0);
+    public static final Position upleft = new Position(-1, 1);
+    public static final Position upright = new Position(1, 1);
+    public static final Position downleft = new Position(-1, -1);
+    public static final Position downright = new Position(1, -1);
     
     
     @Override

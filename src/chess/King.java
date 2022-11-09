@@ -9,14 +9,12 @@ public class King extends Piece {
     void calculateMoves() {
         super.calculateMoves();
         
-        for (int dy = -1; dy <= 1; dy++) {
-            for (int dx = -1; dx <= 1; dx++) {
-                if (dx == 0 && dy == 0) continue;
-                
-                Position pos = new Position(position.x + dx, position.y + dy);
-                if (chess.inBoard(pos) && (chess.getPiece(pos) == null || chess.getPiece(pos).getTeam() != team)) {
-                    moves.add(pos);
-                }
+        for (Position dir : new Position[] {
+            Position.upleft, Position.up, Position.upright, Position.left, Position.right, Position.downleft, Position.down, Position.downright
+        }) {
+            Position pos = position.add(dir);
+            if (chess.inBoard(pos) && (chess.getPiece(pos) == null || chess.getPiece(pos).getTeam() != team)) {
+                moves.add(pos);
             }
         }
     }
