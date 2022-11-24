@@ -14,6 +14,7 @@ public class MyFrame extends JFrame implements MouseListener {
     Position startPos;
     Position endPos;
     JPanel mainPanel;
+    JPanel subPanel;
 
     public void SetIcons()
     {
@@ -38,12 +39,12 @@ public class MyFrame extends JFrame implements MouseListener {
         for(int i = 0; i < 12; i++)
         {
             Image img = pieces[i].getImage();
-            Image changed = img.getScaledInstance(50,50, Image.SCALE_SMOOTH);
+            Image changed = img.getScaledInstance(45,45, Image.SCALE_SMOOTH);
             pieces[i] = new ImageIcon(changed);
         }
 
         setTitle("첫번째 프레임");
-        setSize(500, 500);
+        setSize(600, 500);
         setResizable(false);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -52,7 +53,12 @@ public class MyFrame extends JFrame implements MouseListener {
 
     public void UpdateFrame()
     {
+        JPanel panel = new JPanel();
+        panel.setLayout(new FlowLayout());
         mainPanel = new JPanel();
+        subPanel = new JPanel();
+        mainPanel.setSize(500,500);
+        subPanel.setSize(100,500);
         mainPanel.setLayout(new GridLayout(8, 8));
         mainPanel.setBackground(Color.darkGray);
 
@@ -68,6 +74,7 @@ public class MyFrame extends JFrame implements MouseListener {
 
                 blank.setBackground(blankCol);
                 JLabel jl = new JLabel();
+                blank.label = jl;
                 blank.posX = j;
                 blank.posY = i;
                 jl.setSize(60,60);
@@ -111,7 +118,9 @@ public class MyFrame extends JFrame implements MouseListener {
                 blank.addMouseListener(this);
             }
         }
-        add(mainPanel);
+        panel.add(mainPanel);
+        panel.add(subPanel);
+        add(panel);
         setVisible(true);
     }
 
@@ -119,15 +128,13 @@ public class MyFrame extends JFrame implements MouseListener {
     public void mousePressed(MouseEvent e) {
         PieceBlank pieceBlank = (PieceBlank)e.getSource();
         startPos = new Position(pieceBlank.posX, pieceBlank.posY);
-        System.out.println("From. " + pieceBlank.posX + " / " + pieceBlank.posY);
     }
     @Override
     public void mouseReleased(MouseEvent e) {
         if(startPos != null && endPos != null)
         {
             PieceBlank pieceFull = (PieceBlank)e.getSource();
-            System.out.println("To. " + endPos.x + " / " + endPos.y);
-            System.out.println(myChess.move(startPos, endPos));
+            myChess.move(startPos, endPos);
             startPos = null;
             endPos = null;
             UpdateFrame();
@@ -150,10 +157,7 @@ public class MyFrame extends JFrame implements MouseListener {
     @Override
     public void mouseExited(MouseEvent e) {
         PieceBlank b = (PieceBlank)e.getSource();
-        if ((b.posX + (b.posY%2)) % 2 == 0)
-            b.setBackground(new Color(255, 255, 255));
-        else
-            b.setBackground(new Color(100, 100, 100));
+        //b.setBackground(backCol);
     }
 }
 
