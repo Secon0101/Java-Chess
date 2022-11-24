@@ -1,9 +1,9 @@
-import chess.*;
+import chess.Chess;
 
 public class Main {
     public static void main(String[] args) {
-        Chess chess = new Chess();
-
-        MyFrame frame = new MyFrame(chess);
+        final Chess chess = new Chess();
+        new MyFrame(chess);
+        chess.startGame();
     }
 }

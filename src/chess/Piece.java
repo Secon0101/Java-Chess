@@ -1,37 +1,30 @@
 package chess;
 
+import java.util.List;
 import java.util.LinkedList;
 
-public abstract class Piece {
-    protected final Chess chess;
+public class Piece {
+    protected final Chess board;
+    protected final List<Position> moves = new LinkedList<>();
     protected final Team team;
-    protected Position position;
-    protected LinkedList<Position> moves = new LinkedList<>();
+    protected final Position position;
     
     
-    Piece(Chess chess, Team team, Position position) {
-        this.chess = chess;
+    Piece(Chess board, Team team, Position position) {
+        this.board = board;
         this.team = team;
         this.position = position;
     }
     
     
-    public Team getTeam() {
-        return team;
-    }
-    public LinkedList<Position> getMoves() {
-        return moves;
-    }
-    public Position getPosition() {
-        return position;
-    }
-    void setPosition(Position pos) {
-        position = pos;
-    }
+    public Team getTeam() { return team; }
+    Position getPosition() { return position; }
     
-    
-    /** 현재 말이 이동 가능한 위치 리스트를 새로 계산한다. */
-     void calculateMoves() {
+    void calculateMoves() {
         moves.clear();
+    }
+    
+    boolean hasMove(Position pos) {
+        return moves.contains(pos);
     }
 }

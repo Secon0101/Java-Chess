@@ -1,20 +1,27 @@
 package chess;
 
 public class King extends Piece {
-    King(Chess chess, Team team, Position position) {
-        super(chess, team, position);
+    public King(Chess board, Team team, Position position) {
+        super(board, team, position);
     }
-    
+
     @Override
     void calculateMoves() {
         super.calculateMoves();
-        
-        for (Position dir : new Position[] {
-            Position.upleft, Position.up, Position.upright, Position.left, Position.right, Position.downleft, Position.down, Position.downright
-        }) {
-            Position pos = position.add(dir);
-            if (chess.inBoard(pos) && (chess.getPiece(pos) == null || chess.getPiece(pos).getTeam() != team)) {
-                moves.add(pos);
+
+        for (int dy = -1; dy <= 1; dy++) {
+            for (int dx = -1; dx <= 1; dx++) {
+                if (dx == 0 && dy == 0)
+                    continue;
+
+                int x = position.x + dx;
+                int y = position.y + dy;
+                if (Chess.inBoard(x, y)) {
+                    Piece piece = board.getPiece(x, y);
+                    if (piece == null || piece.team != team) {
+                        moves.add(new Position(x, y));
+                    }
+                }
             }
         }
     }
