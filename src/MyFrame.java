@@ -149,7 +149,7 @@ public class MyFrame extends JFrame implements MouseListener {
     @Override
     public void mouseExited(MouseEvent e) {
         PieceBlank b = (PieceBlank)e.getSource();
-        //b.setBackground(backCol);
+        b.setBackground(backCol);
     }
 }
 
