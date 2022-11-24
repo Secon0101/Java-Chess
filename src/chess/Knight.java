@@ -8,7 +8,5 @@ public class Knight extends Piece {
     @Override
     void calculateMoves() {
         super.calculateMoves();
-        
-        // TODO knight
     }
 }

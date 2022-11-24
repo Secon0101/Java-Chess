@@ -5,13 +5,15 @@ public class Bishop extends Piece {
         super(chess, team, position);
     }
     
+    private final Position[] directions = new Position[] {
+        Position.upleft, Position.upright, Position.downleft, Position.downright
+    };
+    
     @Override
     void calculateMoves() {
         super.calculateMoves();
         
-        for (Position dir : new Position[] {
-            Position.upleft, Position.upright, Position.downleft, Position.downright
-        }) {
+        for (Position dir : directions) {
             Position pos = position.add(dir);
             while (chess.inBoard(pos) && (chess.getPiece(pos) == null || chess.getPiece(pos).getTeam() != team)) {
                 moves.add(pos);

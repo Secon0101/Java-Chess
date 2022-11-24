@@ -5,13 +5,15 @@ public class Rook extends Piece {
         super(chess, team, position);
     }
     
+    private final Position[] directions = new Position[] {
+        Position.up, Position.left, Position.right, Position.down
+    };
+    
     @Override
     void calculateMoves() {
         super.calculateMoves();
         
-        for (Position dir : new Position[] {
-            Position.up, Position.down, Position.left, Position.right
-        }) {
+        for (Position dir : directions) {
             Position pos = position.add(dir);
             while (chess.inBoard(pos) && (chess.getPiece(pos) == null || chess.getPiece(pos).getTeam() != team)) {
                 moves.add(pos);
