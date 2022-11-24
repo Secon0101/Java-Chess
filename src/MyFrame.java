@@ -12,6 +12,9 @@ public class MyFrame extends JFrame implements MouseListener {
     ImageIcon[] pieces = new ImageIcon[12];
     Color backCol;
     Chess myChess;
+    Piece selectedPiece;
+
+    JLabel[][] displays = new JLabel[8][8];
 
     MyFrame(Chess chess) {
 
@@ -56,62 +59,40 @@ public class MyFrame extends JFrame implements MouseListener {
                     blankCol = new Color(100, 100, 100);
 
                 njp.setBackground(blankCol);
-                JLabel jl = new JLabel();
+                PieceBlank jl = new PieceBlank();
+                jl.posX = j;
+                jl.posY = i;
                 jl.setSize(60,60);
 
-                if(chess.getPiece(j,i) instanceof Pawn)
+                Piece curPiece = chess.getPiece(j,i);
+                int plusIndex = 0;
+                if(curPiece.getTeam() == Team.WHITE)
                 {
-                    int plusIndex = 0;
-                    if(chess.getPiece(j,i).getTeam() == Team.WHITE)
-                    {
-                        plusIndex = 6;
+                    plusIndex = 6;
+                }
 
-                    }
+                if(curPiece instanceof Pawn)
+                {
                     jl.setIcon(pieces[plusIndex + 0]);
                 }
-                if(chess.getPiece(j,i) instanceof Rook)
+                if(curPiece instanceof Rook)
                 {
-                    int plusIndex = 0;
-                    if(chess.getPiece(j,i).getTeam() == Team.WHITE)
-                    {
-                        plusIndex = 6;
-                    }
                     jl.setIcon(pieces[plusIndex + 1]);
                 }
-                if(chess.getPiece(j,i) instanceof Knight)
+                if(curPiece instanceof Knight)
                 {
-                    int plusIndex = 0;
-                    if(chess.getPiece(j,i).getTeam() == Team.WHITE)
-                    {
-                        plusIndex = 6;
-                    }
                     jl.setIcon(pieces[plusIndex + 2]);
                 }
-                if(chess.getPiece(j,i) instanceof Bishop)
+                if(curPiece instanceof Bishop)
                 {
-                    int plusIndex = 0;
-                    if(chess.getPiece(j,i).getTeam() == Team.WHITE)
-                    {
-                        plusIndex = 6;
-                    }
                     jl.setIcon(pieces[plusIndex + 3]);
                 }
-                if(chess.getPiece(j,i) instanceof Queen)
+                if(curPiece instanceof Queen)
                 {
-                    int plusIndex = 0;
-                    if(chess.getPiece(j,i).getTeam() == Team.WHITE)
-                    {
-                        plusIndex = 6;
-                    }
                     jl.setIcon(pieces[plusIndex + 4]);
                 }
-                if(chess.getPiece(j,i) instanceof King)
+                if(curPiece instanceof King)
                 {
-                    int plusIndex = 0;
-                    if(chess.getPiece(j,i).getTeam() == Team.WHITE)
-                    {
-                        plusIndex = 6;
-                    }
                     jl.setIcon(pieces[plusIndex + 5]);
                 }
                 njp.add(jl);
@@ -125,11 +106,16 @@ public class MyFrame extends JFrame implements MouseListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
-
+        PieceBlank pieceBlank = (PieceBlank)e.getSource();
+        selectedPiece = myChess.getPiece(pieceBlank.posX, pieceBlank.posY);
     }
     @Override
     public void mouseReleased(MouseEvent e) {
-
+        if(selectedPiece != null)
+        {
+            PieceBlank pieceBlank = (PieceBlank)e.getSource();
+            //myChess.move(selectedPiece.)
+        }
     }
     @Override
     public void mouseClicked(MouseEvent e) {
