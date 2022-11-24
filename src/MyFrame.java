@@ -14,7 +14,6 @@ public class MyFrame extends JFrame implements MouseListener {
     Position startPos;
     Position endPos;
     JPanel mainPanel;
-    JPanel subPanel;
 
     public void SetIcons()
     {
@@ -43,8 +42,8 @@ public class MyFrame extends JFrame implements MouseListener {
             pieces[i] = new ImageIcon(changed);
         }
 
-        setTitle("첫번째 프레임");
-        setSize(600, 500);
+        setTitle("♟ Chess Game ♟ 【 Turn: " + myChess.getTurn().toString() + " 】");
+        setSize(500, 500);
         setResizable(false);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -53,12 +52,7 @@ public class MyFrame extends JFrame implements MouseListener {
 
     public void UpdateFrame()
     {
-        JPanel panel = new JPanel();
-        panel.setLayout(new FlowLayout());
         mainPanel = new JPanel();
-        subPanel = new JPanel();
-        mainPanel.setSize(500,500);
-        subPanel.setSize(100,500);
         mainPanel.setLayout(new GridLayout(8, 8));
         mainPanel.setBackground(Color.darkGray);
 
@@ -118,9 +112,7 @@ public class MyFrame extends JFrame implements MouseListener {
                 blank.addMouseListener(this);
             }
         }
-        panel.add(mainPanel);
-        panel.add(subPanel);
-        add(panel);
+        add(mainPanel);
         setVisible(true);
     }
 
@@ -133,11 +125,11 @@ public class MyFrame extends JFrame implements MouseListener {
     public void mouseReleased(MouseEvent e) {
         if(startPos != null && endPos != null)
         {
-            PieceBlank pieceFull = (PieceBlank)e.getSource();
             myChess.move(startPos, endPos);
             startPos = null;
             endPos = null;
             UpdateFrame();
+            setTitle("♟ Chess Game ♟ 【 Turn: " + myChess.getTurn().toString() + " 】");
         }
     }
     @Override
