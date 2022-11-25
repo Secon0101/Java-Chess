@@ -6,12 +6,14 @@ import java.util.ArrayList;
 public class Chess {
     private final Piece[][] board = new Piece[8][8];
     private final List<Piece> pieces = new ArrayList<>(32);
+    private final King[] kings = new King[2];
     
     private boolean playing;
     private Team turn = Team.WHITE;
     
     
     public Chess() {
+        // 말 놓기
         for (int y = 8; y >= 1; y -= 7) {
             final Team team = y == 8 ? Team.BLACK : Team.WHITE;
             placePiece(new Rook(this, team, new Position(1, y)));
@@ -22,20 +24,19 @@ public class Chess {
             placePiece(new Bishop(this, team, new Position(6, y)));
             placePiece(new Knight(this, team, new Position(7, y)));
             placePiece(new Rook(this, team, new Position(8, y)));
-            for (int x = 1; x <= 8; x++)
+            for (int x = 1; x <= 8; x++) {
                 placePiece(new Pawn(this, team, new Position(x, y == 8 ? 7 : 2)));
+            }
         }
         
         calculateMoves();
     }
-    private void placePiece(Piece piece) {
-        setPiece(piece.position, piece);
-        pieces.add(piece);
-    }
     
+    /** 게임을 시작한다. 이후로 {@code move} 메서드를 사용할 수 있다. */
     public void startGame() {
         playing = true;
     }
+    /** 게임을 끝낸다. */
     public void endGame() {
         playing = false;
     }
@@ -48,8 +49,17 @@ public class Chess {
     public Piece getPiece(int x, int y) { return board[y-1][x-1]; }
     /** 왼쪽 아래가 (1, 1), 오른쪽 위가 (8, 8) */
     public Piece getPiece(Position pos) { return board[pos.y-1][pos.x-1]; }
-    
+    /** 왼쪽 아래가 (1, 1), 오른쪽 위가 (8, 8) */ 
     private void setPiece(Position pos, Piece piece) { board[pos.y-1][pos.x-1] = piece; }
+    
+    /** 위치(좌표)가 8x8 체스판 안에 있는지 판단한다. */
+    public static boolean inBoard(int x, int y) {
+        return 1 <= x && x <= 8 && 1 <= y && y <= 8;
+    }
+    /** 위치(좌표)가 8x8 체스판 안에 있는지 판단한다. */
+    public static boolean inBoard(Position position) {
+        return 1 <= position.x && position.x <= 8 && 1 <= position.y && position.y <= 8;
+    }
     
     /** from 위치에 있는 말을 to 위치로 옮긴다.
      * @return 이동 성공 여부 + 실패했다면 실패 원인
@@ -68,17 +78,22 @@ public class Chess {
         if (!piece.hasMove(to))
             return MoveResult.INVALID_MOVE;
         
-        if (getPiece(to) != null)
+        // 말 옮기기
+        if (getPiece(to) != null) {
             pieces.remove(getPiece(to));
+        }
         setPiece(from, null);
         setPiece(to, piece);
         piece.position.set(to);
         
-        if (piece instanceof OnMovedListener p)
+        if (piece instanceof OnMovedListener p) {
             p.onMoved();
+        }
         
+        // 다음 이동 계산
         calculateMoves();
         
+        // 턴 교체
         turn = turn == Team.BLACK ? Team.WHITE : Team.BLACK;
         
         return MoveResult.SUCCESS;
@@ -90,19 +105,22 @@ public class Chess {
         placePiece(new Queen(this, pawn.team, pawn.position));
     }
     
-    /** 위치(좌표)가 8x8 체스판 안에 있는지 판단한다. */
-    public static boolean inBoard(int x, int y) {
-        return 1 <= x && x <= 8 && 1 <= y && y <= 8;
-    }
-    /** 위치(좌표)가 8x8 체스판 안에 있는지 판단한다. */
-    public static boolean inBoard(Position position) {
-        return 1 <= position.x && position.x <= 8 && 1 <= position.y && position.y <= 8;
-    }
-    
     /** 판 위에 있는 모든 말들의 이동 가능 위치를 계산해서, 그 말에 저장해 놓는다. */
     private void calculateMoves() {
-        for (int i = 0; i < pieces.size(); i++)
+        for (int i = 0; i < pieces.size(); i++) {
             pieces.get(i).calculateMoves();
+        }
+    }
+    
+    /** 말을 이차원 배열과 말 리스트에 추가한다. */
+    private void placePiece(Piece piece) {
+        setPiece(piece.position, piece);
+        pieces.add(piece);
+        
+        // 킹이면 따로 저장
+        if (piece instanceof King king) {
+            kings[king.getTeam().value()] = king;
+        }
     }
     
     
@@ -130,9 +148,8 @@ public class Chess {
             System.out.printf("%d ", y);
             for (int x = 1; x <= 8; x++) {
                 Piece piece = board.getPiece(x, y);
-                if (piece == null) {
-                    System.out.print("  ");
-                } else {
+                if (piece == null) System.out.print("  ");
+                else {
                     System.out.print(piece.team == Team.BLACK ? "b" : "w");
                     if (piece instanceof Pawn)
                         System.out.print("P");

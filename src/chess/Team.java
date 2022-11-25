@@ -1,6 +1,14 @@
 package chess;
 
 public enum Team {
-    BLACK,
-    WHITE,
+    BLACK(0),
+    WHITE(1);
+    
+    private final int value;
+    
+    private Team(int value) {
+        this.value = value;
+    }
+    
+    public int value() { return value; }
 }
