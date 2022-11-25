@@ -1,8 +1,8 @@
 package chess;
 
 public class Queen extends SlidingPiece {
-    Queen(Chess board, Team team, Position position) {
-        super(board, team, position);
+    Queen(Chess chess, Team team, Position position) {
+        super(chess, team, position);
     }
     
     private final Position[] directions = {

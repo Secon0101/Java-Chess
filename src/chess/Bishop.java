@@ -1,8 +1,8 @@
 package chess;
 
 public class Bishop extends SlidingPiece {
-    Bishop(Chess board, Team team, Position position) {
-        super(board, team, position);
+    Bishop(Chess chess, Team team, Position position) {
+        super(chess, team, position);
     }
     
     private final Position[] directions = {

@@ -1,8 +1,8 @@
 package chess;
 
 public abstract class SlidingPiece extends Piece {
-    SlidingPiece(Chess board, Team team, Position position) {
-        super(board, team, position);
+    SlidingPiece(Chess chess, Team team, Position position) {
+        super(chess, team, position);
     }
     
     @Override
@@ -16,7 +16,7 @@ public abstract class SlidingPiece extends Piece {
             int y = position.y + directions[i].y;
             
             while (Chess.inBoard(x, y)) {
-                Piece piece = board.getPiece(x, y);
+                Piece piece = chess.getPiece(x, y);
                 if (piece == null) {
                     moves.add(new Position(x, y));
                 } else if (piece.getTeam() != team) {

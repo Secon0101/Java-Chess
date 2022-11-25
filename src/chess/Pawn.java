@@ -1,8 +1,8 @@
 package chess;
 
 public class Pawn extends Piece implements OnMovedListener {
-    Pawn(Chess board, Team team, Position position) {
-        super(board, team, position);
+    Pawn(Chess chess, Team team, Position position) {
+        super(chess, team, position);
     }
     
     private final int forward = team == Team.BLACK ? -1 : 1;
@@ -15,7 +15,7 @@ public class Pawn extends Piece implements OnMovedListener {
         for (int i = 1; i <= (isFirstMove ? 2 : 1); i++) {
             int x = position.x;
             int y = position.y + forward * i;
-            if (Chess.inBoard(x, y) && board.getPiece(x, y) == null) {
+            if (Chess.inBoard(x, y) && chess.getPiece(x, y) == null) {
                 moves.add(new Position(x, y));
             }
         }
@@ -24,7 +24,7 @@ public class Pawn extends Piece implements OnMovedListener {
             int x = position.x + dx;
             int y = position.y + forward;
             if (Chess.inBoard(x, y)) {
-                Piece piece = board.getPiece(x, y);
+                Piece piece = chess.getPiece(x, y);
                 if (piece != null && piece.getTeam() != team) {
                     moves.add(new Position(x, y));
                 }
@@ -37,7 +37,7 @@ public class Pawn extends Piece implements OnMovedListener {
         isFirstMove = false;
         
         if (position.y == (team == Team.BLACK ? 1 : 8)) {
-            board.promote(this);
+            chess.promote(this);
         }
     }
 }

@@ -1,8 +1,8 @@
 package chess;
 
 public class King extends Piece {
-    King(Chess board, Team team, Position position) {
-        super(board, team, position);
+    King(Chess chess, Team team, Position position) {
+        super(chess, team, position);
     }
     
     @Override
@@ -17,7 +17,7 @@ public class King extends Piece {
                 int x = position.x + dx;
                 int y = position.y + dy;
                 if (Chess.inBoard(x, y)) {
-                    Piece piece = board.getPiece(x, y);
+                    Piece piece = chess.getPiece(x, y);
                     if (piece == null || piece.getTeam() != team) {
                         moves.add(new Position(x, y));
                     }

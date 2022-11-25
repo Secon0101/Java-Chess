@@ -1,8 +1,8 @@
 package chess;
 
 public class Rook extends SlidingPiece {
-    Rook(Chess board, Team team, Position position) {
-        super(board, team, position);
+    Rook(Chess chess, Team team, Position position) {
+        super(chess, team, position);
     }
     
     private final Position[] directions = {
