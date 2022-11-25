@@ -19,7 +19,7 @@ public abstract class SlidingPiece extends Piece {
                 Piece piece = board.getPiece(x, y);
                 if (piece == null) {
                     moves.add(new Position(x, y));
-                } else if (piece.team != team) {
+                } else if (piece.getTeam() != team) {
                     moves.add(new Position(x, y));
                     break;
                 }
