@@ -6,17 +6,41 @@ import java.awt.GridLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Collections;
+import java.util.LinkedList;
+
 public class MyFrame extends JFrame implements MouseListener {
 
     ImageIcon[] pieces = new ImageIcon[12];
-    Color backCol;
+    Color selectPieceCol = new Color(153,255,102);
+    Color movePosCol = new Color(255,200,100);
+    Color canKillCol = new Color(255, 100,100);
     Chess myChess;
     Position startPos;
     Position endPos;
     JPanel mainPanel;
+    Piece selectedPiece = null;
 
-    public void SetIcons()
-    {
+    MyFrame(Chess chess) {
+        myChess = chess;
+        SetIcons();
+        for (int i = 0; i < 12; i++) {
+            Image img = pieces[i].getImage();
+            Image changed = img.getScaledInstance(45, 45, Image.SCALE_SMOOTH);
+            pieces[i] = new ImageIcon(changed);
+        }
+
+        setTitle("♟ Chess Game ♟ 【 Turn: " + myChess.getTurn().toString() + " 】");
+        setSize(500, 500);
+        setResizable(false);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        UpdateFrame();
+    }
+
+    public void SetIcons() {
         pieces[0] = new ImageIcon("res/images/PB.png");
         pieces[1] = new ImageIcon("res/images/RB.png");
         pieces[2] = new ImageIcon("res/images/NB.png");
@@ -31,27 +55,7 @@ public class MyFrame extends JFrame implements MouseListener {
         pieces[11] = new ImageIcon("res/images/KW.png");
     }
 
-    MyFrame(Chess chess) {
-
-        myChess = chess;
-        SetIcons();
-        for(int i = 0; i < 12; i++)
-        {
-            Image img = pieces[i].getImage();
-            Image changed = img.getScaledInstance(45,45, Image.SCALE_SMOOTH);
-            pieces[i] = new ImageIcon(changed);
-        }
-
-        setTitle("♟ Chess Game ♟ 【 Turn: " + myChess.getTurn().toString() + " 】");
-        setSize(500, 500);
-        setResizable(false);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        UpdateFrame();
-    }
-
-    public void UpdateFrame()
-    {
+    public void UpdateFrame() {
         mainPanel = new JPanel();
         mainPanel.setLayout(new GridLayout(8, 8));
         mainPanel.setBackground(Color.darkGray);
@@ -61,49 +65,39 @@ public class MyFrame extends JFrame implements MouseListener {
                 Color blankCol = new Color(0, 0, 0);
                 PieceBlank blank = new PieceBlank();
 
-                if ((j + (i%2)) % 2 == 0)
-                    blankCol = new Color(255, 255, 255);
-                else
-                    blankCol = new Color(100, 100, 100);
+                if ((j + (i % 2)) % 2 == 0) blankCol = new Color(255, 255, 255);
+                else blankCol = new Color(100, 100, 100);
 
                 blank.setBackground(blankCol);
                 JLabel jl = new JLabel();
                 blank.label = jl;
                 blank.posX = j;
                 blank.posY = i;
-                jl.setSize(60,60);
+                jl.setSize(60, 60);
 
-                if(myChess.getPiece(j,i) != null)
-                {
-                    Piece curPiece = myChess.getPiece(j,i);
+                if (myChess.getPiece(j, i) != null) {
+                    Piece curPiece = myChess.getPiece(j, i);
                     int plusIndex = 0;
-                    if(curPiece.getTeam() == Team.WHITE)
-                    {
+                    if (curPiece.getTeam() == Team.WHITE) {
                         plusIndex = 6;
                     }
 
-                    if(curPiece instanceof Pawn)
-                    {
-                        jl.setIcon(pieces[plusIndex + 0]);
+                    if (curPiece instanceof Pawn) {
+                        jl.setIcon(pieces[plusIndex]);
                     }
-                    if(curPiece instanceof Rook)
-                    {
+                    if (curPiece instanceof Rook) {
                         jl.setIcon(pieces[plusIndex + 1]);
                     }
-                    if(curPiece instanceof Knight)
-                    {
+                    if (curPiece instanceof Knight) {
                         jl.setIcon(pieces[plusIndex + 2]);
                     }
-                    if(curPiece instanceof Bishop)
-                    {
+                    if (curPiece instanceof Bishop) {
                         jl.setIcon(pieces[plusIndex + 3]);
                     }
-                    if(curPiece instanceof Queen)
-                    {
+                    if (curPiece instanceof Queen) {
                         jl.setIcon(pieces[plusIndex + 4]);
                     }
-                    if(curPiece instanceof King)
-                    {
+                    if (curPiece instanceof King) {
                         jl.setIcon(pieces[plusIndex + 5]);
                     }
                 }
@@ -117,12 +111,66 @@ public class MyFrame extends JFrame implements MouseListener {
     }
 
     @Override
-    public void mousePressed(MouseEvent e) {
-        PieceBlank pieceBlank = (PieceBlank)e.getSource();
-        startPos = new Position(pieceBlank.posX, pieceBlank.posY);
+    public void mouseClicked(MouseEvent e) {
+        if (e.getButton() == MouseEvent.BUTTON1) {
+            PieceBlank pieceBlank = (PieceBlank) e.getSource();
+            if (selectedPiece != null) {
+                endPos = new Position(pieceBlank.posX, pieceBlank.posY);
+                if (myChess.move(startPos, endPos) == MoveResult.SUCCESS) {
+                    startPos = null;
+                    setTitle("♟ Chess Game ♟ 【 Turn: " + myChess.getTurn().toString() + " 】");
+                }
+                endPos = null;
+                selectedPiece = null;
+            } else {
+                if (myChess.getPiece(pieceBlank.posX, pieceBlank.posY) != null) {
+                    selectedPiece = myChess.getPiece(pieceBlank.posX, pieceBlank.posY);
+                    if (selectedPiece.getTeam() == myChess.getTurn()) {
+                        startPos = new Position(pieceBlank.posX, pieceBlank.posY);
+                        List<Position> moves = myChess.getPiece(pieceBlank.posX, pieceBlank.posY).getMoves();
+                        List<PieceBlank> blanks = new ArrayList<>();
+                        for (int i = 0; i < 64; i++) {
+                            blanks.add((PieceBlank) mainPanel.getComponent(i));
+                        }
+                        for (int i = 0; i < moves.size(); i++) {
+                            for (int j = 0; j < blanks.size(); j++) {
+                                if (blanks.get(j).posX == moves.get(i).x && blanks.get(j).posY == moves.get(i).y) {
+                                    if(myChess.getPiece(blanks.get(j).posX, blanks.get(j).posY) == null)
+                                    {
+                                        blanks.get(j).setBackground(movePosCol);
+                                    }
+                                    else
+                                    {
+                                        blanks.get(j).setBackground(canKillCol);
+                                    }
+                                }
+                            }
+                        }
+                        pieceBlank.setBackground(selectPieceCol);
+                    } else {
+                        selectedPiece = null;
+                    }
+                }
+            }
+            UpdateFrame();
+        }
+        if (e.getButton() == MouseEvent.BUTTON3) {
+            startPos = null;
+            selectedPiece = null;
+        }
+        System.out.println(selectedPiece);
     }
     @Override
+    public void mousePressed(MouseEvent e) {
+        /*
+        PieceBlank pieceBlank = (PieceBlank)e.getSource();
+        startPos = new Position(pieceBlank.posX, pieceBlank.posY);
+         */
+    }
+
+    @Override
     public void mouseReleased(MouseEvent e) {
+        /*
         if(startPos != null && endPos != null)
         {
             myChess.move(startPos, endPos);
@@ -131,25 +179,15 @@ public class MyFrame extends JFrame implements MouseListener {
             UpdateFrame();
             setTitle("♟ Chess Game ♟ 【 Turn: " + myChess.getTurn().toString() + " 】");
         }
+        */
     }
-    @Override
-    public void mouseClicked(MouseEvent e) {
 
-    }
     @Override
     public void mouseEntered(MouseEvent e) {
-        PieceBlank b = (PieceBlank)e.getSource();
-        backCol = b.getBackground();
-        //b.setBackground(new Color(153,255,102));
-        if(startPos != null)
-        {
-            endPos = new Position(b.posX, b.posY);
-        }
     }
+
     @Override
     public void mouseExited(MouseEvent e) {
-        PieceBlank b = (PieceBlank)e.getSource();
-        b.setBackground(backCol);
     }
 }
 
