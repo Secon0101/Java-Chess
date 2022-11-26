@@ -3,7 +3,7 @@ package chess;
 import java.util.List;
 import java.util.ArrayList;
 
-public class Chess {
+public final class Chess {
     private final Piece[][] board = new Piece[8][8];
     private final List<Piece> pieces = new ArrayList<>(32);
     private final King[] kings = new King[2];
@@ -32,25 +32,26 @@ public class Chess {
         calculateMoves();
     }
     
-    /** 게임을 시작한다. 이후로 {@code move} 메서드를 사용할 수 있다. */
-    public void startGame() {
-        playing = true;
-    }
-    /** 게임을 끝낸다. */
-    public void endGame() {
-        playing = false;
-    }
-    /** 어느 쪽 팀의 차례인지 반환한다. */
-    public Team getTurn() {
-        return turn;
-    }
     
+    /** 어느 쪽 팀의 차례인지 반환한다. */
+    public Team getTurn() { return turn; }
     /** 왼쪽 아래가 (1, 1), 오른쪽 위가 (8, 8) */
     public Piece getPiece(int x, int y) { return board[y-1][x-1]; }
     /** 왼쪽 아래가 (1, 1), 오른쪽 위가 (8, 8) */
     public Piece getPiece(Position pos) { return board[pos.y-1][pos.x-1]; }
     /** 왼쪽 아래가 (1, 1), 오른쪽 위가 (8, 8) */ 
     private void setPiece(Position pos, Piece piece) { board[pos.y-1][pos.x-1] = piece; }
+    
+    
+    /** 게임을 시작한다. 이후로 {@code move} 메서드를 사용할 수 있다. */
+    public void startGame() {
+        playing = true;
+    }
+    
+    /** 게임을 끝낸다. */
+    public void endGame() {
+        playing = false;
+    }
     
     /** 위치(좌표)가 8x8 체스판 안에 있는지 판단한다. */
     public static boolean inBoard(int x, int y) {
@@ -105,69 +106,22 @@ public class Chess {
         placePiece(new Queen(this, pawn.team, pawn.position));
     }
     
-    /** 판 위에 있는 모든 말들의 이동 가능 위치를 계산해서, 그 말에 저장해 놓는다. */
-    private void calculateMoves() {
-        for (int i = 0; i < pieces.size(); i++) {
-            pieces.get(i).calculateMoves();
-        }
-    }
     
     /** 말을 이차원 배열과 말 리스트에 추가한다. */
     private void placePiece(Piece piece) {
         setPiece(piece.position, piece);
         pieces.add(piece);
-        
+
         // 킹이면 따로 저장
         if (piece instanceof King king) {
             kings[king.getTeam().value()] = king;
         }
     }
     
-    
-    
-    // debug!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    public static void main(String[] args) {
-        final Chess chess = new Chess();
-        chess.startGame();
-        printBoard(chess);
-        try (java.util.Scanner scanner = new java.util.Scanner(System.in)) {
-            while (true) {
-                System.out.printf("\n%s\nmove (x1 y1 x2 y2) - ", chess.getTurn());
-                moveWithResult(chess, scanner.nextInt(), scanner.nextInt(), scanner.nextInt(), scanner.nextInt());
-            }
+    /** 판 위에 있는 모든 말들의 이동 가능 위치를 계산해서, 그 말에 저장해 놓는다. */
+    private void calculateMoves() {
+        for (int i = 0; i < pieces.size(); i++) {
+            pieces.get(i).calculateMoves();
         }
-    }
-    private static void moveWithResult(Chess chess, int x1, int y1, int x2, int y2) {
-        MoveResult result = chess.move(new Position(x1, y1), new Position(x2, y2));
-        printBoard(chess);
-        System.out.println(result);
-    }
-    private static void printBoard(Chess board) {
-        System.out.println("   1  2  3  4  5  6  7  8");
-        for (int y = 8; y >= 1; y--) {
-            System.out.printf("%d ", y);
-            for (int x = 1; x <= 8; x++) {
-                Piece piece = board.getPiece(x, y);
-                if (piece == null) System.out.print("  ");
-                else {
-                    System.out.print(piece.team == Team.BLACK ? "b" : "w");
-                    if (piece instanceof Pawn)
-                        System.out.print("P");
-                    else if (piece instanceof Rook)
-                        System.out.print("R");
-                    else if (piece instanceof King)
-                        System.out.print("K");
-                    else if (piece instanceof Bishop)
-                        System.out.print("B");
-                    else if (piece instanceof Knight)
-                        System.out.print("N");
-                    else if (piece instanceof Queen)
-                        System.out.print("Q");
-                }
-                System.out.print(" ");
-            }
-            System.out.printf("%d\n", y);
-        }
-        System.out.println("   1  2  3  4  5  6  7  8");
     }
 }
