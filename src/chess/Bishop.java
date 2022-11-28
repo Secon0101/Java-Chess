@@ -1,10 +1,10 @@
 package chess;
 
+/** 비숍 */
 public class Bishop extends SlidingPiece {
-    Bishop(Chess chess, Team team, Position position) {
-        super(chess, team, position);
-    }
+    Bishop(Team team, Position position) { super(team, position); }
     
+    // X 4방향
     private final Position[] directions = {
         new Position(1, 1),
         new Position(-1, 1),
@@ -13,7 +13,5 @@ public class Bishop extends SlidingPiece {
     };
     
     @Override
-    protected Position[] getDirections() {
-        return directions;
-    }
+    protected Position[] getDirections() { return directions; }
 }

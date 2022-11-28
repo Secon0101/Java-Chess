@@ -1,10 +1,10 @@
 package chess;
 
+/** 퀸 */
 public class Queen extends SlidingPiece {
-    Queen(Chess chess, Team team, Position position) {
-        super(chess, team, position);
-    }
+    Queen(Team team, Position position) { super(team, position); }
     
+    // 8방향
     private final Position[] directions = {
         new Position(1, 0),
         new Position(1, 1),
@@ -17,7 +17,5 @@ public class Queen extends SlidingPiece {
     };
     
     @Override
-    protected Position[] getDirections() {
-        return directions;
-    }
+    protected Position[] getDirections() { return directions; }
 }

@@ -1,5 +1,6 @@
 package chess;
 
+/** (x, y) 좌표를 저장할 수 있는 클래스 */
 public class Position {
     public int x;
     public int y;
@@ -14,10 +15,6 @@ public class Position {
     public void add(int x, int y) { this.x += x; this.y += y; }
     public void set(int x, int y) { this.x = x; this.y = y; }
     public void set(Position pos) { x = pos.x; y = pos.y; }
-    
-    public Position plus(int x, int y) {
-        return new Position(this.x + x, this.y + y);
-    }
     
     
     @Override
