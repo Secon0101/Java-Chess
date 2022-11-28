@@ -19,12 +19,9 @@ public class Position {
     
     @Override
     public boolean equals(Object obj) {
-        if (obj == null)
-            return false;
-        if (obj == this)
-            return true;
-        if (!(obj instanceof Position))
-            return false;
+        if (obj == null) return false;
+        if (obj == this) return true;
+        if (!(obj instanceof Position)) return false;
 
         Position pos = (Position) obj;
         return pos.x == x && pos.y == y;

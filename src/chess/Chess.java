@@ -10,7 +10,7 @@ public class Chess {
     public Chess() {
         // 말 놓기
         for (int y = 8; y >= 1; y -= 7) {
-            final Team team = y == 8 ? Team.BLACK : Team.WHITE;
+            Team team = y == 8 ? Team.BLACK : Team.WHITE;
             placePiece(new Rook(team, new Position(1, y)));
             placePiece(new Knight(team, new Position(2, y)));
             placePiece(new Bishop(team, new Position(3, y)));
@@ -61,6 +61,7 @@ public class Chess {
     public MoveResult move(Position from, Position to) {
         if (!playing) return MoveResult.NOT_PLAYING;
         if (!inBoard(from) || !inBoard(to)) return MoveResult.OUT_OF_BOARD;
+        if (to.equals(board.getKingPosition(turn.opponent()))) return MoveResult.ATTACKED_KING;
         
         Piece piece = getPiece(from);
         if (piece == null) return MoveResult.NO_PIECE;
@@ -76,12 +77,13 @@ public class Chess {
         }
         
         // 다음 이동 계산
-        calculateMoves();
+        MoveResult result = calculateMoves();
+        System.out.println(result);
         
         // 턴 교체
         turn = turn == Team.BLACK ? Team.WHITE : Team.BLACK;
         
-        return MoveResult.SUCCESS;
+        return result;
     }
     
     /** 폰을 퀸으로 승격시킨다. */
@@ -94,12 +96,23 @@ public class Chess {
         board.setPiece(piece.position, piece);
     }
     
-    /** 판 위에 있는 모든 말들의 현재 이동 가능 위치를 계산해서, 그 말에 저장해 놓는다. */
-    private void calculateMoves() {
+    /** 판 위에 있는 모든 말들의 현재 이동 가능 위치를 계산해서, 그 말에 저장해 놓는다.
+     * <p> 체크 등 여부도 계산한다. </p>
+     * @return 체크 / 체크메이트 / 스테일메이트면 그에 맞는 {@link MoveResult}, 아니면 {@link MoveResult#SUCCESS} */
+    private MoveResult calculateMoves() {
+        boolean check = false;
         for (Piece piece : board.getPieceIterator()) {
             if (piece == null) continue;
             
-            piece.calculateMoves(board);
+            if (piece.calculateMoves(board) == true) {
+                check = true;
+            }
         }
+        
+        return check ? MoveResult.CHECK : MoveResult.SUCCESS;
     }
+    
+    
+    /** 혹시라도 게임 오류로 인해 킹이 잡히는 경우 터지는 예외이다. */
+    public static class AttackedKingException extends RuntimeException { }
 }

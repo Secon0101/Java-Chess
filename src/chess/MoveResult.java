@@ -13,6 +13,8 @@ package chess;
  *   <li>{@link #CHECK} - 이동 성공 + 체크</li>
  *   <li>{@link #CHECKMATE} - 이동 성공 + 체크메이트</li>
  *   <li>{@link #STALEMATE} - 이동 성공 + 스테일메이트</li>
+ *   <br>
+ *   <li>{@link #ATTACKED_KING} - 킹을 잡으려고 시도함 (오류) </li>
  * </ul>
  */
 public enum MoveResult {
@@ -35,4 +37,7 @@ public enum MoveResult {
     CHECKMATE,
     /** 이동 성공 + 스테일메이트 */
     STALEMATE,
+    
+    /** 킹을 잡으려고 시도함 (오류) */
+    ATTACKED_KING,
 }

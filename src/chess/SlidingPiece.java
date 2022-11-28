@@ -5,8 +5,10 @@ abstract class SlidingPiece extends Piece {
     SlidingPiece(Team team, Position position) { super(team, position); }
     
     @Override
-    void calculateMoves(Board board) {
-        super.calculateMoves(board);
+    boolean calculateMoves(Board board) {
+        moves.clear();
+        final Position kingPos = board.getKingPosition(team.opponent());
+        boolean check = false;
         
         final Position[] directions = getDirections();
         
@@ -21,7 +23,11 @@ abstract class SlidingPiece extends Piece {
                     moves.add(new Position(x, y));
                 } else {
                     if (piece.team != team) {
-                        moves.add(new Position(x, y));
+                        Position pos = new Position(x, y);
+                        moves.add(pos);
+                        if (!check && pos.equals(kingPos)) {
+                            check = true;
+                        }
                     }
                     break;
                 }
@@ -29,6 +35,8 @@ abstract class SlidingPiece extends Piece {
                 y += directions[i].y;
             }
         }
+        
+        return check;
     }
     
     /** 말이 이동할 수 있는 방향(단위벡터)들을 리턴한다.

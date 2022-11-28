@@ -7,8 +7,10 @@ public class Knight extends Piece {
     }
 
     @Override
-    void calculateMoves(Board board) {
-        super.calculateMoves(board);
+    boolean calculateMoves(Board board) {
+        moves.clear();
+        final Position kingPos = board.getKingPosition(team.opponent());
+        boolean check = false;
         
         // 앞으로 2칸 + 옆으로 1칸에 말이 없거나 상대편 말이 있으면 이동
         for (int dy = -2; dy <= 2; dy++) {
@@ -20,10 +22,14 @@ public class Knight extends Piece {
                 if (!Chess.inBoard(x, y)) continue;
                 
                 Piece piece = board.getPiece(x, y);
-                if (piece == null || piece.getTeam() != team) {
-                    moves.add(new Position(x, y));
+                if (piece == null || piece.team != team) {
+                    Position pos = new Position(x, y);
+                    moves.add(pos);
+                    return !check && pos.equals(kingPos);
                 }
             }
         }
+        
+        return check;
     }
 }

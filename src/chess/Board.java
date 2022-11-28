@@ -18,10 +18,14 @@ class Board {
     /** 왼쪽 아래가 (1, 1), 오른쪽 위가 (8, 8) */
     Piece getPiece(Position pos) { return board[pos.y-1][pos.x-1]; }
     
-    /** 왼쪽 아래가 (1, 1), 오른쪽 위가 (8, 8) */
-    void setPiece(int x, int y, Piece piece) {
+    /** 왼쪽 아래가 (1, 1), 오른쪽 위가 (8, 8)
+     * @throws Chess.AttackedKingException {@code (x, y)} 위치에 킹이 있다는 건 뭔가 잘못된 것이다. */
+    void setPiece(int x, int y, Piece piece) throws Chess.AttackedKingException {
         // 전에 있던 말 제거
         if (getPiece(x, y) != null) {
+            if (piece != null && piece instanceof King) {
+                throw new Chess.AttackedKingException();
+            }
             pieces.remove(getPiece(x, y));
         }
         
@@ -38,11 +42,15 @@ class Board {
             kings[king.team.ordinal()] = king;
         }
     }
-    /** 왼쪽 아래가 (1, 1), 오른쪽 위가 (8, 8) */
-    void setPiece(Position pos, Piece piece) { setPiece(pos.x, pos.y, piece); }
+    /** 왼쪽 아래가 (1, 1), 오른쪽 위가 (8, 8)
+     * @throws Chess.AttackedKingException {@code (x, y)} 위치에 킹이 있다는 건 뭔가 잘못된 것이다. */
+    void setPiece(Position pos, Piece piece) throws Chess.AttackedKingException {
+        try { setPiece(pos.x, pos.y, piece); }
+        catch (Chess.AttackedKingException e) { throw e; }
+    }
     
-    /** 그 팀의 킹을 리턴한다. */
-    King getKing(Team team) { return kings[team.ordinal()]; }
+    /** 그 팀의 킹의 위치를 리턴한다. */
+    Position getKingPosition(Team team) { return kings[team.ordinal()].position; }
     
     /** 보드에 있는 모든 말을 순회하는 이터레이터를 리턴한다. */
     Iterable<Piece> getPieceIterator() {

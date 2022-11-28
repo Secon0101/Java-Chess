@@ -6,8 +6,8 @@ public class King extends Piece {
     
     
     @Override
-    void calculateMoves(Board board) {
-        super.calculateMoves(board);
+    boolean calculateMoves(Board board) {
+        moves.clear();
         
         // 8방향 1칸에 말이 없거나 상대편 말이 있으면 이동
         for (int dy = -1; dy <= 1; dy++) {
@@ -19,10 +19,12 @@ public class King extends Piece {
                 if (!Chess.inBoard(x, y)) continue;
                 
                 Piece piece = board.getPiece(x, y);
-                if (piece == null || piece.getTeam() != team) {
+                if (piece == null || piece.team != team) {
                     moves.add(new Position(x, y));
                 }
             }
         }
+        
+        return false; // 킹은 상대편을 체크할 수 없음
     }
 }
