@@ -6,6 +6,9 @@ public class Chess {
     private boolean playing;
     private Team turn = Team.WHITE;
     
+    /** @see #removeIllegalMoves() */
+    private final Board tempBoard = new Board();
+    
     
     public Chess() {
         // 말 놓기
@@ -24,7 +27,7 @@ public class Chess {
             }
         }
         
-        calculateMoves();
+        calculateMoves(board, null);
     }
     
     
@@ -77,13 +80,15 @@ public class Chess {
         }
         
         // 다음 이동 계산
-        MoveResult result = calculateMoves();
-        System.out.println(result);
+        boolean check = calculateMoves(board, null);
         
         // 턴 교체
         turn = turn == Team.BLACK ? Team.WHITE : Team.BLACK;
         
-        return result;
+        // 잘못된 이동 방지
+        removeIllegalMoves();
+        
+        return check ? MoveResult.CHECK : MoveResult.SUCCESS;
     }
     
     /** 폰을 퀸으로 승격시킨다. */
@@ -96,23 +101,68 @@ public class Chess {
         board.setPiece(piece.position, piece);
     }
     
-    /** 판 위에 있는 모든 말들의 현재 이동 가능 위치를 계산해서, 그 말에 저장해 놓는다.
-     * <p> 체크 등 여부도 계산한다. </p>
-     * @return 체크 / 체크메이트 / 스테일메이트면 그에 맞는 {@link MoveResult}, 아니면 {@link MoveResult#SUCCESS} */
-    private MoveResult calculateMoves() {
+    /** 주어진 판 위에 있는 모든 말들의 현재 이동 가능 위치를 계산해서, 그 말에 저장해 놓는다. 특정한 팀만 계산할 수도 있다.
+     * <p> 하는 김에 체크 여부도 계산한다. </p>
+     * @param board 계산할 보드
+     * @param team 계산할 팀. null이면 모든 팀 계산
+     * @return 체크 여부 */
+    private boolean calculateMoves(Board board, Team team) {
         boolean check = false;
         for (Piece piece : board.getPieceIterator()) {
             if (piece == null) continue;
+            if (team != null && piece.team != team) continue;
             
             if (piece.calculateMoves(board) == true) {
                 check = true;
             }
         }
         
-        return check ? MoveResult.CHECK : MoveResult.SUCCESS;
+        return check;
+    }
+    
+    /** 말들의 이동 가능 위치 중 이동했을 때 우리 편이 체크당하는 경우를 제거한다.
+     * <p> {@link #tempBoard}에서 이동 위치를 전부 시뮬레이션하여, 체크가 된다면 제거한다. </p> */
+    private void removeIllegalMoves() {
+        // board를 tempBoard에 복사
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                tempBoard.setPiece(i, j, board.getPiece(i, j));
+            }
+        }
+        
+        // 다음에 이동할 팀의 모든 말에 대해
+        for (Piece piece : board.getPieceIterator()) {
+            if (piece == null || piece.team != turn) continue;
+            
+            System.out.printf("계산 대상: %s\n", piece); // debug~~~~~~~~~~~~~~~
+            
+            // 말을 모든 이동 가능 위치로 이동시키고 체크 여부 확인
+            var iter = piece.moves.iterator();
+            while (iter.hasNext()) {
+                Position to = iter.next();
+                System.out.printf("  위치: %s\n", to); // debug~~~~~~~~~~~~~~~
+                
+                tempBoard.setPiece(piece.position, null);
+                tempBoard.setPiece(to, piece);
+                piece.position.set(to);
+                
+                System.out.println(tempBoard); // debug~~~~~~~~~~~~~~~
+                
+                // 체크라면 이동 가능 위치 제거
+                System.out.printf("%s\n", turn);
+                if (calculateMoves(tempBoard, turn.opponent())) {
+                    iter.remove();
+                    System.out.println("    Invalid"); // debug!!!!!!!!!!!!!!!!
+                } else {
+                    System.out.println("    Valid"); // debug!!!!!!!!!!!!!!!!
+                }
+            }
+        }
     }
     
     
-    /** 혹시라도 게임 오류로 인해 킹이 잡히는 경우 터지는 예외이다. */
+    /** 혹시라도 게임 오류로 인해 킹이 잡히는 경우 터뜨릴 예외이다. */
     public static class AttackedKingException extends RuntimeException { }
+    
+    public String boardToString() { return board.toString(); }
 }
