@@ -47,6 +47,10 @@ public class StartFrame extends JFrame implements MouseListener {
             new MyFrame(chess);
             chess.startGame();
         });
+
+        btn2.addActionListener(e ->{
+            //인간 대 인공지능
+        });
     }
 
     @Override

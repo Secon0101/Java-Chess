@@ -157,6 +157,7 @@ public class MyFrame extends JFrame implements MouseListener {
         if (e.getButton() == MouseEvent.BUTTON3) {
             startPos = null;
             selectedPiece = null;
+            UpdateFrame();
         }
         System.out.println(selectedPiece);
     }
