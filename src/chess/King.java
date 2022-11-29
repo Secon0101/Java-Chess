@@ -11,6 +11,8 @@ public class King extends Piece implements OnMovedListener {
     @Override
     boolean calculateMoves(Board board) {
         moves.clear();
+        final Position kingPos = board.getKingPosition(team.opponent());
+        boolean check = false;
         
         // 8방향 1칸에 말이 없거나 상대편 말이 있으면 이동
         for (int dy = -1; dy <= 1; dy++) {
@@ -23,7 +25,9 @@ public class King extends Piece implements OnMovedListener {
                 
                 Piece piece = board.getPiece(x, y);
                 if (piece == null || piece.team != team) {
-                    moves.add(new Position(x, y));
+                    Position pos = new Position(x, y);
+                    moves.add(pos);
+                    check = check || pos.equals(kingPos);
                 }
             }
         }
@@ -35,7 +39,9 @@ public class King extends Piece implements OnMovedListener {
              && board.getPiece(7, originY) == null
              && board.getPiece(8, originY) instanceof Rook rook
              && rook.notMoved()) {
-                moves.add(new Position(7, originY));
+                Position pos = new Position(7, originY);
+                moves.add(pos);
+                check = check || pos.equals(kingPos);
             }
             // 퀸 사이드
             if (board.getPiece(4, originY) == null
@@ -43,11 +49,13 @@ public class King extends Piece implements OnMovedListener {
              && board.getPiece(2, originY) == null
              && board.getPiece(1, originY) instanceof Rook rook
              && rook.notMoved()) {
-                moves.add(new Position(3, originY));
+                Position pos = new Position(3, originY);
+                moves.add(pos);
+                check = check || pos.equals(kingPos);
             }
         }
         
-        return false; // 킹은 상대편을 체크할 수 없음
+        return check;
     }
     
     /** 킹이 한 번도 움직이지 않았으면 {@code true}. 캐슬링 체크 용 */
