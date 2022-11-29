@@ -78,6 +78,26 @@ public class Chess {
         board.setPiece(from, null);
         board.setPiece(to, piece);
         
+        // 캐슬링 (이동이 된다는 것 자체가 캐슬링 가능이므로 따로 검사는 안 한다)
+        if (piece instanceof King king) {
+            if (from.equals(5, 1)) {
+                // 킹 사이드
+                if (to.equals(7, 1)) {
+                    Piece rook = getPiece(8, to.y);
+                    board.setPiece(8, to.y, null);
+                    board.setPiece(6, to.y, rook);
+                    ((OnMovedListener) rook).onMoved(this);
+                }
+                // 퀸 사이드
+                else if (to.equals(3, 1)) {
+                    Piece rook = getPiece(1, to.y);
+                    board.setPiece(1, to.y, null);
+                    board.setPiece(4, to.y, rook);
+                    ((OnMovedListener) rook).onMoved(this);
+                }
+            }
+        }
+        
         if (piece instanceof OnMovedListener p) {
             p.onMoved(this);
         }
