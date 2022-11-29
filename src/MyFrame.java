@@ -116,9 +116,24 @@ public class MyFrame extends JFrame implements MouseListener {
             PieceBlank pieceBlank = (PieceBlank) e.getSource();
             if (selectedPiece != null) {
                 endPos = new Position(pieceBlank.posX, pieceBlank.posY);
-                if (myChess.move(startPos, endPos) == MoveResult.SUCCESS) {
+                if (myChess.move(startPos, endPos) == MoveResult.SUCCESS || myChess.move(startPos, endPos) == MoveResult.CHECK) {
                     startPos = null;
                     setTitle("♟ Chess Game ♟ 【 Turn: " + myChess.getTurn().toString() + " 】");
+                    if(myChess.move(startPos, endPos) == MoveResult.CHECK)
+                    {
+                        List<PieceBlank> blanks = new ArrayList<>();
+                        for (int i = 0; i < 64; i++) {
+                            blanks.add((PieceBlank) mainPanel.getComponent(i));
+                        }
+                        for(int i = 0; i < blanks.size(); i++)
+                        {
+                            Piece tempPiece = myChess.getPiece(blanks.get(i).posX,blanks.get(i).posY);
+                            if(tempPiece instanceof King)
+                            {
+                                blanks.get(i).setBackground(new Color(200,0,200));
+                            }
+                        }
+                    }
                 }
                 endPos = null;
                 selectedPiece = null;
