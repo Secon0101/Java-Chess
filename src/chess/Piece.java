@@ -4,7 +4,10 @@ import java.util.List;
 import java.util.LinkedList;
 import java.util.Collections;
 
+/** 체스 말 */
 public abstract class Piece {
+    /** 말이 이동할 수 있는 위치 리스트.
+     * @see #calculateMoves() */
     protected final List<Position> moves = new LinkedList<>();
     protected final Team team;
     protected final Position position;
