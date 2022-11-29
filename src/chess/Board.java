@@ -18,17 +18,14 @@ class Board {
     /** 왼쪽 아래가 (1, 1), 오른쪽 위가 (8, 8) */
     Piece getPiece(Position pos) { return board[pos.y-1][pos.x-1]; }
     
-    /** 왼쪽 아래가 (1, 1), 오른쪽 위가 (8, 8)
-     * @throws Chess.AttackedKingException {@code (x, y)} 위치에 킹이 있다는 건 뭔가 잘못된 것이다. */
-    void setPiece(int x, int y, Piece piece) throws Chess.AttackedKingException {
-        if (getPiece(x, y) != null) {
-            if (getPiece(x, y) == piece) return; // 변화 없음
+    /** 왼쪽 아래가 (1, 1), 오른쪽 위가 (8, 8) */
+    void setPiece(int x, int y, Piece piece) {
+        Piece oldPiece = getPiece(x, y);
+        if (oldPiece != null) {
+            if (oldPiece == piece) return; // 변화 없음
             
             // 전에 있던 말 제거
-            if (piece != null && piece instanceof King) {
-                throw new Chess.AttackedKingException();
-            }
-            pieces.remove(getPiece(x, y));
+            pieces.remove(oldPiece);
         }
         
         // 말 추가
@@ -43,12 +40,8 @@ class Board {
             kings[king.team.ordinal()] = king;
         }
     }
-    /** 왼쪽 아래가 (1, 1), 오른쪽 위가 (8, 8)
-     * @throws Chess.AttackedKingException {@code (x, y)} 위치에 킹이 있다는 건 뭔가 잘못된 것이다. */
-    void setPiece(Position pos, Piece piece) throws Chess.AttackedKingException {
-        try { setPiece(pos.x, pos.y, piece); }
-        catch (Chess.AttackedKingException e) { throw e; }
-    }
+    /** 왼쪽 아래가 (1, 1), 오른쪽 위가 (8, 8) */
+    void setPiece(Position pos, Piece piece) { setPiece(pos.x, pos.y, piece); }
     
     /** 그 팀의 킹의 위치를 리턴한다. */
     Position getKingPosition(Team team) { return kings[team.ordinal()].position; }

@@ -22,6 +22,8 @@ public abstract class Piece {
     public Position gePosition() { return position; }
     /** 말이 이동 가능한 모든 위치 리스트를 리턴한다. ({@link Collections#unmodifiableList 불변 리스트}) */
     public List<Position> getMoves() { return Collections.unmodifiableList(moves); }
+    /** 말의 이동 가능 위치의 개수를 리턴한다. */
+    public int getMoveCount() { return moves.size(); }
     
     /** 주어진 보드에서 움직일 수 있는 모든 위치를 계산하고, 저장해 놓는다. {@link #getMoves()} 메서드로 그 리스트를 얻을 수 있다.
      * <p> 하는 김에 체크 여부도 계산한다. </p>

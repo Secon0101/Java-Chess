@@ -82,16 +82,18 @@ public class Chess {
             p.onMoved(this);
         }
         
-        // 다음 이동 계산
+        // 다음 이동 계산 + 체크 확인
         boolean check = calculateMoves(board, null);
         
         // 턴 교체
         turn = turn == Team.BLACK ? Team.WHITE : Team.BLACK;
         
-        // 잘못된 이동 방지
-        removeIllegalMoves();
-        
-        return check ? MoveResult.CHECK : MoveResult.SUCCESS;
+        // 잘못된 이동 제거 + 최종 판정
+        MoveResult result = removeIllegalMoves(check);
+        if (result == MoveResult.CHECKMATE || result == MoveResult.STALEMATE) {
+            endGame();
+        }
+        return result;
     }
     
     /** 폰을 퀸으로 승격시킨다. */
@@ -123,9 +125,11 @@ public class Chess {
         return check;
     }
     
-    /** 말들의 이동 가능 위치 중 이동했을 때 우리 편이 체크당하는 경우를 제거한다.
-     * <p> {@link #tempBoard}에서 이동 위치를 전부 시뮬레이션하여, 체크가 된다면 제거한다. </p> */
-    private void removeIllegalMoves() {
+    /** 말들의 이동 가능 위치 중 이동했을 때 우리 편이 체크당하는 경우를 제거한다. {@link #tempBoard}에서 이동 위치를 전부 시뮬레이션하여, 체크가 된다면 제거한다.
+     * <p> 체크, 체크메이트, 스테일메이트 또는 셋 다 아닌 상태를 최종적으로 결정한다. </p>
+     * @param isCheckNow 현재 체크 상태. 체크메이트/스테일메이트 구분에 쓰인다.
+     * @return 체크/체크메이트/스테일메이트라면 그에 맞는 {@link MoveResult}, 아니면 {@link MoveResult#SUCCESS} */
+    private MoveResult removeIllegalMoves(boolean isCheckNow) {
         // board를 tempBoard에 복사
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
@@ -134,6 +138,8 @@ public class Chess {
         }
         
         System.out.println("\nremoveIllegalMoves():"); // debug
+        int moveCount = 0; // 말 하나를 계산한 후 최종 이동 경로의 개수 저장 (to check checkmate)
+        
         // 다음에 이동할 팀의 모든 말에 대해
         for (Piece piece : board.getPieceIterator()) {
             if (piece == null || piece.team != turn) continue;
@@ -147,12 +153,14 @@ public class Chess {
                 Position to = iter.next();
                 System.out.printf("    %s - ", to); // debug
                 
+                // 이동
                 tempBoard.setPiece(piece.position, null);
-                Piece tempPiece = tempBoard.getPiece(to);
+                Piece tempPiece = tempBoard.getPiece(to); // 롤백하려고 얻어놓음
                 tempBoard.setPiece(to, piece);
                 
                 // 체크라면 이동 가능 위치 제거
-                if (calculateMoves(tempBoard, turn.opponent())) {
+                boolean check = calculateMoves(tempBoard, turn.opponent());
+                if (check) {
                     iter.remove();
                     System.out.println("Invalid"); // debug
                 } else {
@@ -163,13 +171,20 @@ public class Chess {
                 tempBoard.setPiece(to, tempPiece);
                 tempBoard.setPiece(tempPos, piece);
             }
+            
+            // 최종 이동 위치 개수 저장
+            if (moveCount == 0) {
+                moveCount += piece.getMoveCount();
+            }
         }
         System.out.println("end\n"); // debug
+        
+        // 현재 체크 상태, 이동 가능 위치 개수에 따라 최종 결과 리턴
+        if (moveCount == 0) return isCheckNow ? MoveResult.CHECKMATE : MoveResult.STALEMATE;
+        else return isCheckNow ? MoveResult.CHECK : MoveResult.SUCCESS;
     }
     
     
-    /** 혹시라도 게임 오류로 인해 킹이 잡히는 경우 터뜨릴 예외이다. */
-    public static class AttackedKingException extends RuntimeException { }
-    
+    /** {@code board.toString()} */
     public String boardToString() { return board.toString(); }
 }
