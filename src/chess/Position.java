@@ -13,9 +13,14 @@ public class Position {
     }
     
     
+    /** {@link (x, y)}만큼 더한다. */
     public void add(int x, int y) { this.x += x; this.y += y; }
+    /** {@link (x, y)} 값을 설정한다. */
     public void set(int x, int y) { this.x = x; this.y = y; }
+    /** {@link (x, y)} 값을 설정한다. */
     public void set(Position pos) { x = pos.x; y = pos.y; }
+    /** {@link (x, y)} 값이 동일한지 체크한다. */
+    public boolean equals(int x, int y) { return this.x == x && this.y == y; }
     
     
     @Override
