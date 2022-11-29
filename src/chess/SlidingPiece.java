@@ -25,9 +25,7 @@ abstract class SlidingPiece extends Piece {
                     if (piece.team != team) {
                         Position pos = new Position(x, y);
                         moves.add(pos);
-                        if (!check && pos.equals(kingPos)) {
-                            check = true;
-                        }
+                        check = check || pos.equals(kingPos);
                     }
                     break;
                 }

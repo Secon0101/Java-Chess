@@ -22,7 +22,7 @@ class Board {
      * @throws Chess.AttackedKingException {@code (x, y)} 위치에 킹이 있다는 건 뭔가 잘못된 것이다. */
     void setPiece(int x, int y, Piece piece) throws Chess.AttackedKingException {
         if (getPiece(x, y) != null) {
-            if (getPiece(x, y).equals(piece)) return; // 변화 없음
+            if (getPiece(x, y) == piece) return; // 변화 없음
             
             // 전에 있던 말 제거
             if (piece != null && piece instanceof King) {
@@ -35,8 +35,7 @@ class Board {
         board[y-1][x-1] = piece;
         if (piece != null) {
             piece.position.set(x, y);
-            if (!pieces.contains(piece))
-                pieces.add(piece);
+            pieces.add(piece);
         }
         
         // 킹이면 따로 저장

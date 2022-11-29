@@ -25,7 +25,7 @@ public class Knight extends Piece {
                 if (piece == null || piece.team != team) {
                     Position pos = new Position(x, y);
                     moves.add(pos);
-                    return !check && pos.equals(kingPos);
+                    check = check || pos.equals(kingPos);
                 }
             }
         }

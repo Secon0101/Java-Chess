@@ -6,8 +6,11 @@ public class Chess {
     private boolean playing;
     private Team turn = Team.WHITE;
     
+    // 임시 변수들
     /** @see #removeIllegalMoves() */
     private final Board tempBoard = new Board();
+    /** @see #removeIllegalMoves() */
+    private final Position tempPos = new Position();
     
     
     public Chess() {
@@ -130,34 +133,38 @@ public class Chess {
             }
         }
         
+        System.out.println("\nremoveIllegalMoves():"); // debug
         // 다음에 이동할 팀의 모든 말에 대해
         for (Piece piece : board.getPieceIterator()) {
             if (piece == null || piece.team != turn) continue;
             
-            System.out.printf("계산 대상: %s\n", piece); // debug~~~~~~~~~~~~~~~
+            System.out.printf("  piece: %s\n", piece); // debug
             
             // 말을 모든 이동 가능 위치로 이동시키고 체크 여부 확인
+            tempPos.set(piece.position); // 이전 위치 백업
             var iter = piece.moves.iterator();
             while (iter.hasNext()) {
                 Position to = iter.next();
-                System.out.printf("  위치: %s\n", to); // debug~~~~~~~~~~~~~~~
+                System.out.printf("    %s - ", to); // debug
                 
                 tempBoard.setPiece(piece.position, null);
+                Piece tempPiece = tempBoard.getPiece(to);
                 tempBoard.setPiece(to, piece);
-                piece.position.set(to);
-                
-                System.out.println(tempBoard); // debug~~~~~~~~~~~~~~~
                 
                 // 체크라면 이동 가능 위치 제거
-                System.out.printf("%s\n", turn);
                 if (calculateMoves(tempBoard, turn.opponent())) {
                     iter.remove();
-                    System.out.println("    Invalid"); // debug!!!!!!!!!!!!!!!!
+                    System.out.println("Invalid"); // debug
                 } else {
-                    System.out.println("    Valid"); // debug!!!!!!!!!!!!!!!!
+                    System.out.println("Valid"); // debug
                 }
+                
+                // 다시 원래대로
+                tempBoard.setPiece(to, tempPiece);
+                tempBoard.setPiece(tempPos, piece);
             }
         }
+        System.out.println("end\n"); // debug
     }
     
     
