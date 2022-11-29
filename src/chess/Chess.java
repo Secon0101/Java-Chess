@@ -6,7 +6,9 @@ public class Chess {
     private boolean playing;
     private Team turn = Team.WHITE;
     
-    // 임시 변수들
+    /** 바로 전 턴에 움직인 말
+     *  @see #move() */
+    private Piece lastMovedPiece;
     /** @see #removeIllegalMoves() */
     private final Board tempBoard = new Board();
     /** @see #removeIllegalMoves() */
@@ -74,11 +76,18 @@ public class Chess {
         if (piece.team != turn) return MoveResult.INVALID_TURN;
         if (!piece.hasMove(to)) return MoveResult.INVALID_MOVE;
         
+        // 앙파상 (폰이 대각선 이동했는데 공격할 말이 없는 경우)
+        if (piece instanceof Pawn pawn) {
+            if (getPiece(to) == null && from.y + pawn.forward() == to.y && Math.abs(to.x - from.x) == 1) {
+                board.setPiece(to.x, to.y - pawn.forward(), null);
+            }
+        }
+        
         // 말 옮기기
         board.setPiece(from, null);
         board.setPiece(to, piece);
         
-        // 캐슬링 (이동이 된다는 것 자체가 캐슬링 가능이므로 따로 검사는 안 한다)
+        // 캐슬링 (이동이 된다는 것 자체가 캐슬링 가능이므로 따로 검사는 안 함)
         if (piece instanceof King king) {
             if (from.equals(5, 1)) {
                 // 킹 사이드
@@ -98,9 +107,14 @@ public class Chess {
             }
         }
         
+        // 이동 완료 후 처리
         if (piece instanceof OnMovedListener p) {
             p.onMoved(this);
         }
+        if (lastMovedPiece != null && lastMovedPiece instanceof Pawn pawn) {
+            pawn.wasMovedRightBefore = false;
+        }
+        lastMovedPiece = piece;
         
         // 다음 이동 계산 + 체크 확인
         boolean check = calculateMoves(board, null);
@@ -116,15 +130,6 @@ public class Chess {
         return result;
     }
     
-    /** 폰을 퀸으로 승격시킨다. */
-    void promote(Pawn pawn) {
-        placePiece(new Queen(pawn.team, pawn.position));
-    }
-    
-    /** 말을 보드 위에 놓는다. */
-    private void placePiece(Piece piece) {
-        board.setPiece(piece.position, piece);
-    }
     
     /** 주어진 판 위에 있는 모든 말들의 현재 이동 가능 위치를 계산해서, 그 말에 저장해 놓는다. 특정한 팀만 계산할 수도 있다.
      * <p> 하는 김에 체크 여부도 계산한다. </p>
@@ -202,6 +207,16 @@ public class Chess {
         // 현재 체크 상태, 이동 가능 위치 개수에 따라 최종 결과 리턴
         if (moveCount == 0) return isCheckNow ? MoveResult.CHECKMATE : MoveResult.STALEMATE;
         else return isCheckNow ? MoveResult.CHECK : MoveResult.SUCCESS;
+    }
+    
+    /** 말을 보드 위에 놓는다. */
+    private void placePiece(Piece piece) {
+        board.setPiece(piece.position, piece);
+    }
+    
+    /** 폰을 퀸으로 승격시킨다. */
+    void promote(Pawn pawn) {
+        placePiece(new Queen(pawn.team, pawn.position));
     }
     
     
