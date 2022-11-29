@@ -19,8 +19,12 @@ public class Pawn extends Piece implements OnMovedListener {
             int x = position.x;
             int y = position.y + forward * i;
             
-            if (Chess.inBoard(x, y) && board.getPiece(x, y) == null) {
-                moves.add(new Position(x, y));
+            if (Chess.inBoard(x, y)) {
+                if (board.getPiece(x, y) == null) {
+                    moves.add(new Position(x, y));
+                } else {
+                    break;
+                }
             }
         }
         
