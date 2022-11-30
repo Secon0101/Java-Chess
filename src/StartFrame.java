@@ -22,7 +22,7 @@ public class StartFrame extends JFrame {
         sub1.setBackground(Color.darkGray);
         FlowLayout fl = new FlowLayout(FlowLayout.CENTER,0,100);
         sub1.setLayout(fl);
-        JLabel jl = new JLabel("Chess Game");
+        JLabel jl = new JLabel("Chessing in Java");
         jl.setOpaque(true);
         jl.setFont(jl.getFont().deriveFont(50f));
         jl.setForeground(new Color(255,255,255));
@@ -81,7 +81,7 @@ public class StartFrame extends JFrame {
         btn1.setForeground(new Color(255,255,255));
         btn2.setText("BLACK");
         btn2.setForeground(new Color(0));
-        jl.setText("CHOOSE COLOR");
+        jl.setText("Choose Color");
         setVisible(true);
     }
 }

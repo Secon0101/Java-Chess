@@ -118,19 +118,25 @@ public class MyFrame extends JFrame implements MouseListener, MoveResultListener
                 blank.addMouseListener(this);
             }
         }
-
         add(mainPanel);
         setVisible(true);
     }
 
-    private void Win()
-    {
-        setTitle("♟ Chess Game ♟ 【 " + myChess.getTurn().opponent() + " WON : CHECKMATE 】");
-    }
-
-    private void Draw()
-    {
-        setTitle("♟ Chess Game ♟ 【 DRAW : STALEMATE 】");
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        if (inGame)
+        {
+            if (e.getButton() == MouseEvent.BUTTON1)
+            {
+                PieceBlank pieceBlank = (PieceBlank) e.getSource();
+                PieceMove(pieceBlank);
+            }
+            if (e.getButton() == MouseEvent.BUTTON3) {
+                startPos = null;
+                selectedPiece = null;
+                UpdateFrame();
+            }
+        }
     }
 
     private void PieceMove(PieceBlank selectedPieceBlank)
@@ -228,23 +234,16 @@ public class MyFrame extends JFrame implements MouseListener, MoveResultListener
         selectedPiece = null;
     }
 
-    @Override
-    public void mouseClicked(MouseEvent e) {
-        if (inGame)
-        {
-            if (e.getButton() == MouseEvent.BUTTON1)
-            {
-                PieceBlank pieceBlank = (PieceBlank) e.getSource();
-                PieceMove(pieceBlank);
-            }
-            if (e.getButton() == MouseEvent.BUTTON3) {
-                startPos = null;
-                selectedPiece = null;
-                UpdateFrame();
-            }
-            System.out.println(selectedPiece);
-        }
+    private void Win()
+    {
+        setTitle("♟ Chess Game ♟ 【 " + myChess.getTurn().opponent() + " WON : CHECKMATE 】");
     }
+
+    private void Draw()
+    {
+        setTitle("♟ Chess Game ♟ 【 DRAW : STALEMATE 】");
+    }
+
     @Override
     public void mousePressed(MouseEvent e) {
 
