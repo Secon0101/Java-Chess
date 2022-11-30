@@ -21,6 +21,8 @@ public class Position {
     public void set(Position pos) { x = pos.x; y = pos.y; }
     /** {@link (x, y)} 값이 동일한지 체크한다. */
     public boolean equals(int x, int y) { return this.x == x && this.y == y; }
+    /** 자신의 복사본을 리턴한다. */
+    public Position copy() { return new Position(x, y); }
     
     
     @Override

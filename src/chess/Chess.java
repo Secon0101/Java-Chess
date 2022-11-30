@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.List;
+import java.util.Random;
 import java.util.LinkedList;
 
 public class Chess {
@@ -12,6 +13,7 @@ public class Chess {
      * @see #endGame() */
     private boolean playing;
     private Team turn = Team.WHITE;
+    private Team aiTeam = null;
     
     /** 바로 전 턴에 움직인 말. 앙파상 체크에 사용됨
      *  @see #move() */
@@ -20,6 +22,9 @@ public class Chess {
     private final Board tempBoard = new Board();
     /** @see #removeIllegalMoves() */
     private final Position tempPos = new Position();
+    private final List<Piece> aiPieces = new LinkedList<>();
+    private final Random rand = new Random();
+    
     
     /** {@link #move()}가 완료됐을 때 {@link MoveResult}를 받는 구독자 */
     private List<MoveResultListener> moveResultListener = new LinkedList<>();
@@ -72,6 +77,7 @@ public class Chess {
      * @see #startGame() */
     public void startAIGame(Team aiTeam, Team firstTurn) {
         turn = firstTurn;
+        this.aiTeam = aiTeam;
         playing = true;
     }
     
@@ -119,7 +125,7 @@ public class Chess {
         }
         lastMovedPiece = piece;
         
-        System.out.printf("%s -> %s\n", from, to); // debug
+        System.out.printf("%s %s %s -> %s\n", turn, piece.getClass(), from, to); // debug
         
         // 다음 이동 계산 + 체크 확인
         boolean check = calculateMoves(board, null);
@@ -137,10 +143,26 @@ public class Chess {
         if (result == MoveResult.CHECKMATE || result == MoveResult.STALEMATE) {
             endGame();
         }
-        System.out.println(result); // debug
+        System.out.println(result); System.out.println(); // debug
         
         // 이동 완료 이벤트 실행
         moveResultListener.forEach(listener -> listener.onMoved(result));
+        
+        // AI 이동 처리
+        if (aiTeam == turn) {
+            // 랜덤 이동
+            aiPieces.clear();
+            for (Piece p : board.getPieceIterator()) {
+                if (p.team != aiTeam || p.getMoveCount() == 0) continue;
+                aiPieces.add(p);
+            }
+            
+            if (aiPieces.size() > 0) {
+                Piece p = aiPieces.get(rand.nextInt(aiPieces.size()));
+                Position pTo = p.moves.get(rand.nextInt(p.getMoveCount()));
+                move(p.position.copy(), pTo);
+            }
+        }
         
         return result;
     }
@@ -222,20 +244,20 @@ public class Chess {
      * @param isCheckNow 현재 체크 상태. 체크메이트/스테일메이트 구분에 쓰인다.
      * @return 체크/체크메이트/스테일메이트라면 그에 맞는 {@link MoveResult}, 아니면 {@link MoveResult#SUCCESS} */
     private MoveResult removeIllegalMoves(boolean isCheckNow) {
-        System.out.println("\nremoveIllegalMoves():"); // debug
+        // System.out.println("\nremoveIllegalMoves():"); // debug
         int moveCount = 0; // 말 하나를 계산한 후 최종 이동 경로의 개수 저장 (to check checkmate)
         
         // 다음에 이동할 팀의 모든 말에 대해
         for (Piece piece : board.getPieceIterator()) {
             if (piece == null || piece.team != turn) continue;
-            System.out.printf("  piece: %s\n", piece); // debug
+            // System.out.printf("  piece: %s\n", piece); // debug
             
             // 말을 모든 이동 가능 위치로 이동시키고 체크 여부 확인
             tempPos.set(piece.position);
             var iter = piece.moves.iterator();
             while (iter.hasNext()) {
                 Position to = iter.next();
-                System.out.printf("    %s - ", to); // debug
+                // System.out.printf("    %s - ", to); // debug
                 
                 // board를 tempBoard에 복사
                 board.copyTo(tempBoard);
@@ -247,9 +269,9 @@ public class Chess {
                 boolean check = calculateMoves(tempBoard, turn.opponent());
                 if (check) {
                     iter.remove();
-                    System.out.println("Invalid"); // debug
+                    // System.out.println("Invalid"); // debug
                 } else {
-                    System.out.println("Valid"); // debug
+                    // System.out.println("Valid"); // debug
                 }
             }
             
@@ -261,7 +283,7 @@ public class Chess {
                 moveCount += piece.getMoveCount();
             }
         }
-        System.out.println("end\n"); // debug
+        // System.out.println("end\n"); // debug
         
         // 현재 체크 상태, 이동 가능 위치 개수에 따라 최종 결과 리턴
         if (moveCount == 0) return isCheckNow ? MoveResult.CHECKMATE : MoveResult.STALEMATE;
