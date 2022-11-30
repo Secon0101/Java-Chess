@@ -169,46 +169,69 @@ public class MyFrame extends JFrame implements MouseListener, MoveResultListener
     {
         if (selectedPiece != null)
         {
-            endPos = new Position(selectedPieceBlank.posX, selectedPieceBlank.posY);
-            myChess.move(startPos, endPos);
-        }
-        else
-        {
-            if (myChess.getPiece(selectedPieceBlank.posX, selectedPieceBlank.posY) != null)
+            Piece curPiece = myChess.getPiece(selectedPieceBlank.posX, selectedPieceBlank.posY);
+            if(curPiece != null)
             {
-                selectedPiece = myChess.getPiece(selectedPieceBlank.posX, selectedPieceBlank.posY);
-                if (selectedPiece.getTeam() == myChess.getTurn())
+                if(curPiece.getTeam() == selectedPiece.getTeam())
                 {
-                    startPos = new Position(selectedPieceBlank.posX, selectedPieceBlank.posY);
-                    List<Position> moves = myChess.getPiece(selectedPieceBlank.posX, selectedPieceBlank.posY).getMoves();
-                    List<PieceBlank> blanks = new ArrayList<>();
-                    for (int i = 0; i < 64; i++)
-                    {
-                        blanks.add((PieceBlank) mainPanel.getComponent(i));
-                    }
-                    for (int i = 0; i < moves.size(); i++)
-                    {
-                        for (int j = 0; j < blanks.size(); j++)
-                        {
-                            if (blanks.get(j).posX == moves.get(i).x && blanks.get(j).posY == moves.get(i).y)
-                            {
-                                if (myChess.getPiece(blanks.get(j).posX, blanks.get(j).posY) == null)
-                                {
-                                    blanks.get(j).setBackground(movePosCol);
-                                }
-                                else
-                                {
-                                    blanks.get(j).setBackground(canKillCol);
-                                }
-                            }
-                        }
-                    }
-                    selectedPieceBlank.setBackground(selectPieceCol);
+                    selectedPiece = curPiece;
+                    ShowMoves(selectedPieceBlank);
                 }
                 else
                 {
-                    selectedPiece = null;
+                    endPos = new Position(selectedPieceBlank.posX, selectedPieceBlank.posY);
+                    myChess.move(startPos, endPos);
                 }
+            }
+            else
+            {
+                endPos = new Position(selectedPieceBlank.posX, selectedPieceBlank.posY);
+                myChess.move(startPos, endPos);
+            }
+        }
+        else
+        {
+            ShowMoves(selectedPieceBlank);
+        }
+    }
+
+    private void ShowMoves(PieceBlank selectedPieceBlank)
+    {
+        UpdateFrame();
+        if (myChess.getPiece(selectedPieceBlank.posX, selectedPieceBlank.posY) != null)
+        {
+            selectedPiece = myChess.getPiece(selectedPieceBlank.posX, selectedPieceBlank.posY);
+            if (selectedPiece.getTeam() == myChess.getTurn())
+            {
+                startPos = new Position(selectedPieceBlank.posX, selectedPieceBlank.posY);
+                List<Position> moves = myChess.getPiece(selectedPieceBlank.posX, selectedPieceBlank.posY).getMoves();
+                List<PieceBlank> blanks = new ArrayList<>();
+                for (int i = 0; i < 64; i++)
+                {
+                    blanks.add((PieceBlank) mainPanel.getComponent(i));
+                }
+                for (int i = 0; i < moves.size(); i++)
+                {
+                    for (int j = 0; j < blanks.size(); j++)
+                    {
+                        if (blanks.get(j).posX == moves.get(i).x && blanks.get(j).posY == moves.get(i).y)
+                        {
+                            if (myChess.getPiece(blanks.get(j).posX, blanks.get(j).posY) == null)
+                            {
+                                blanks.get(j).setBackground(movePosCol);
+                            }
+                            else
+                            {
+                                blanks.get(j).setBackground(canKillCol);
+                            }
+                        }
+                    }
+                }
+                selectedPieceBlank.setBackground(selectPieceCol);
+            }
+            else
+            {
+                selectedPiece = null;
             }
         }
     }
@@ -252,12 +275,14 @@ public class MyFrame extends JFrame implements MouseListener, MoveResultListener
             }
             else
             {
-                kingState[myChess.getTurn().ordinal()] = null;
+                kingState[0] = null;
+                kingState[1] = null;
             }
         }
         endPos = null;
         selectedPiece = null;
         UpdateFrame();
+        System.out.println(kingState[0] + ", " + kingState[1]);
     }
 
     private void Win()
