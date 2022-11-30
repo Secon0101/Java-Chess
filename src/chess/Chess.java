@@ -3,10 +3,14 @@ package chess;
 public class Chess {
     private final Board board = new Board();
     
+    /** 현재 게임이 플레이 중이라면 {@code true}
+     * @see #startGame()
+     * @see #startAIGame()
+     * @see #endGame() */
     private boolean playing;
     private Team turn = Team.WHITE;
     
-    /** 바로 전 턴에 움직인 말
+    /** 바로 전 턴에 움직인 말. 앙파상 체크에 사용됨
      *  @see #move() */
     private Piece lastMovedPiece;
     /** @see #removeIllegalMoves() */
@@ -43,9 +47,34 @@ public class Chess {
     public Piece getPiece(Position pos) { return board.getPiece(pos); }
     
     
-    /** 게임을 시작한다. 이후로 {@code move()} 메서드를 사용할 수 있다. */
+    /** 로컬 멀티플레이(2인용) 게임을 시작한다. 이후로 {@link #move()} 메서드를 사용할 수 있다. 백 팀(아래쪽)이 선공한다.
+     * @see #startAIGame()
+     * @see #endGame() */
     public void startGame() {
         playing = true;
+    }
+    /** 로컬 멀티플레이(2인용) 게임을 시작한다. 이후로 {@link #move()} 메서드를 사용할 수 있다.
+     * @param firstTurn 선공하는 팀
+     * @see #startAIGame()
+     * @see #endGame() */
+    public void startGame(Team firstTurn) {
+        turn = firstTurn;
+        startGame();
+    }
+    
+    /** AI 대전(1인용) 게임을 시작한다. 이후로 {@link #move()} 메서드를 사용할 수 있다.
+     * @param aiTeam AI의 팀. 반대편은 자동적으로 플레이어 팀이 된다.
+     * @see #startGame() */
+    public void startAIGame(Team aiTeam) {
+        playing = true;
+    }
+    /** AI 대전(1인용) 게임을 시작한다. 이후로 {@link #move()} 메서드를 사용할 수 있다.
+     * @param aiTeam AI의 팀. 반대편은 자동적으로 플레이어 팀이 된다.
+     * @param firstTurn 선공하는 팀
+     * @see #startGame() */
+    public void startAIGame(Team aiTeam, Team firstTurn) {
+        turn = firstTurn;
+        startAIGame(aiTeam);
     }
     
     /** 게임을 끝낸다. */
@@ -53,14 +82,6 @@ public class Chess {
         playing = false;
     }
     
-    /** 위치(좌표)가 8x8 체스판 안에 있는지 판단한다. */
-    public static boolean inBoard(int x, int y) {
-        return 1 <= x && x <= 8 && 1 <= y && y <= 8;
-    }
-    /** 위치(좌표)가 8x8 체스판 안에 있는지 판단한다. */
-    public static boolean inBoard(Position position) {
-        return 1 <= position.x && position.x <= 8 && 1 <= position.y && position.y <= 8;
-    }
     
     /** from 위치에 있는 말을 to 위치로 옮긴다.
      * @return 이동 성공 여부 + 실패했다면 실패 원인
@@ -100,6 +121,16 @@ public class Chess {
         }
         System.out.println(result); // debug
         return result;
+    }
+    
+    
+    /** 위치(좌표)가 8x8 체스판 안에 있는지 판단한다. */
+    public static boolean inBoard(int x, int y) {
+        return 1 <= x && x <= 8 && 1 <= y && y <= 8;
+    }
+    /** 위치(좌표)가 8x8 체스판 안에 있는지 판단한다. */
+    public static boolean inBoard(Position position) {
+        return 1 <= position.x && position.x <= 8 && 1 <= position.y && position.y <= 8;
     }
     
     
