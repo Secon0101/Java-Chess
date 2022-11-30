@@ -25,10 +25,10 @@ public class MyFrame extends JFrame implements MouseListener {
     Chess myChess;
     Position startPos;
     Position endPos;
-    JPanel fullPanel;
     JPanel mainPanel;
     Piece selectedPiece = null;
     boolean inGame;
+    boolean[] kingChecked = { false, false }; //black, white
 
     MyFrame(Chess chess) {
         inGame = true;
@@ -45,10 +45,7 @@ public class MyFrame extends JFrame implements MouseListener {
         setResizable(false);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        fullPanel = new JPanel();
-        fullPanel.setLayout(new OverlayLayout(fullPanel));
         UpdateFrame();
-        add(fullPanel);
     }
 
     public void SetIcons() {
@@ -86,27 +83,37 @@ public class MyFrame extends JFrame implements MouseListener {
                 blank.posY = i;
                 jl.setSize(60, 60);
 
-                if (myChess.getPiece(j, i) != null) {
+                if (myChess.getPiece(j, i) != null)
+                {
                     Piece curPiece = myChess.getPiece(j, i);
                     int plusIndex = 0;
-                    if (curPiece.getTeam() == Team.WHITE) {
+                    if (curPiece.getTeam() == Team.WHITE)
+                    {
                         plusIndex = 6;
                     }
-
-                    if (curPiece instanceof Rook) {
+                    if (curPiece instanceof Rook)
+                    {
                         plusIndex += 1;
                     }
-                    else if (curPiece instanceof Knight) {
+                    else if (curPiece instanceof Knight)
+                    {
                         plusIndex += 2;
                     }
-                    else if (curPiece instanceof Bishop) {
+                    else if (curPiece instanceof Bishop)
+                    {
                         plusIndex += 3;
                     }
-                    else if (curPiece instanceof Queen) {
+                    else if (curPiece instanceof Queen)
+                    {
                         plusIndex += 4;
                     }
-                    else if (curPiece instanceof King) {
+                    else if (curPiece instanceof King)
+                    {
                         plusIndex += 5;
+                        if(kingChecked[curPiece.getTeam().value()])
+                        {
+                            blank.setBackground(kingCheckCol);
+                        }
                     }
                     jl.setIcon(pieces[plusIndex]);
                 }
@@ -116,21 +123,107 @@ public class MyFrame extends JFrame implements MouseListener {
             }
         }
 
-        fullPanel.add(mainPanel);
+        add(mainPanel);
         setVisible(true);
     }
 
     private void Win()
     {
-        Team team = null;
-        if(myChess.getTurn() == Team.BLACK) team = Team.WHITE;
-        else team = Team.BLACK;
-        setTitle("♟ Chess Game ♟ 【 " + team + " WON : CHECKMATE 】");
+        setTitle("♟ Chess Game ♟ 【 " + myChess.getTurn().opponent() + " WON : CHECKMATE 】");
     }
 
-    private  void Draw()
+    private void Draw()
     {
         setTitle("♟ Chess Game ♟ 【 DRAW : STALEMATE 】");
+    }
+
+    private void PieceMove(PieceBlank selectedPieceBlank)
+    {
+        if (selectedPiece != null)
+        {
+            endPos = new Position(selectedPieceBlank.posX, selectedPieceBlank.posY);
+            MoveResult result = myChess.move(startPos, endPos);
+            if (result == MoveResult.SUCCESS || result == MoveResult.CHECK || result == MoveResult.CHECKMATE || result == MoveResult.STALEMATE)
+            {
+                startPos = null;
+                setTitle("♟ Chess Game ♟ 【 Turn: " + myChess.getTurn().toString() + " 】");
+                if (result != MoveResult.SUCCESS)
+                {
+                    List<PieceBlank> blanks = new ArrayList<>();
+                    for (int i = 0; i < 64; i++)
+                    {
+                        blanks.add((PieceBlank) mainPanel.getComponent(i));
+                    }
+                    for (int i = 0; i < blanks.size(); i++)
+                    {
+                        Piece tempPiece = myChess.getPiece(blanks.get(i).posX, blanks.get(i).posY);
+                        if (tempPiece instanceof King && tempPiece.getTeam() == myChess.getTurn())
+                        {
+                            if (result == MoveResult.CHECK)
+                            {
+                                setTitle("♟ Chess Game ♟ 【 Turn: " + myChess.getTurn().toString() + " : CHECK 】");
+                                kingChecked[myChess.getTurn().value()] = true;
+                            }
+                            else if (result == MoveResult.CHECKMATE)
+                            {
+                                blanks.get(i).setBackground(kingCheckmateCol);
+                                inGame = false;
+                                Win();
+                            }
+                            else if (result == MoveResult.STALEMATE)
+                            {
+                                blanks.get(i).setBackground(stalemateCol);
+                                inGame = false;
+                                Draw();
+                            }
+                        }
+                    }
+                }
+                kingChecked[myChess.getTurn().opponent().value()] = false;
+            }
+            endPos = null;
+            selectedPiece = null;
+        }
+        else
+        {
+            if (myChess.getPiece(selectedPieceBlank.posX, selectedPieceBlank.posY) != null)
+            {
+                selectedPiece = myChess.getPiece(selectedPieceBlank.posX, selectedPieceBlank.posY);
+                if (selectedPiece.getTeam() == myChess.getTurn())
+                {
+                    startPos = new Position(selectedPieceBlank.posX, selectedPieceBlank.posY);
+                    List<Position> moves = myChess.getPiece(selectedPieceBlank.posX, selectedPieceBlank.posY).getMoves();
+                    List<PieceBlank> blanks = new ArrayList<>();
+                    for (int i = 0; i < 64; i++)
+                    {
+                        blanks.add((PieceBlank) mainPanel.getComponent(i));
+                    }
+                    for (int i = 0; i < moves.size(); i++)
+                    {
+                        for (int j = 0; j < blanks.size(); j++)
+                        {
+                            if (blanks.get(j).posX == moves.get(i).x && blanks.get(j).posY == moves.get(i).y)
+                            {
+                                if (myChess.getPiece(blanks.get(j).posX, blanks.get(j).posY) == null)
+                                {
+                                    blanks.get(j).setBackground(movePosCol);
+                                }
+                                else
+                                {
+                                    blanks.get(j).setBackground(canKillCol);
+                                }
+                            }
+                        }
+                    }
+                    selectedPieceBlank.setBackground(selectPieceCol);
+                }
+                else
+                {
+                    selectedPiece = null;
+                }
+            }
+        }
+        UpdateFrame();
     }
 
     @Override
@@ -140,76 +233,8 @@ public class MyFrame extends JFrame implements MouseListener {
             if (e.getButton() == MouseEvent.BUTTON1)
             {
                 PieceBlank pieceBlank = (PieceBlank) e.getSource();
-                if (selectedPiece != null)
-                {
-                    endPos = new Position(pieceBlank.posX, pieceBlank.posY);
-                    MoveResult result = myChess.move(startPos, endPos);
-                    if (result == MoveResult.SUCCESS || result == MoveResult.CHECK || result == MoveResult.CHECKMATE || result == MoveResult.STALEMATE)
-                    {
-                        startPos = null;
-                        setTitle("♟ Chess Game ♟ 【 Turn: " + myChess.getTurn().toString() + " 】");
-                        if (result != MoveResult.SUCCESS)
-                        {
-                            List<PieceBlank> blanks = new ArrayList<>();
-                            for (int i = 0; i < 64; i++)
-                            {
-                                blanks.add((PieceBlank) mainPanel.getComponent(i));
-                            }
-                            for (int i = 0; i < blanks.size(); i++)
-                            {
-                                Piece tempPiece = myChess.getPiece(blanks.get(i).posX, blanks.get(i).posY);
-                                if (tempPiece instanceof King && tempPiece.getTeam() == myChess.getTurn())
-                                {
-                                    if (result == MoveResult.CHECK)
-                                    {
-                                        blanks.get(i).setBackground(kingCheckCol);
-                                    }
-                                    else if (result == MoveResult.CHECKMATE)
-                                    {
-                                        blanks.get(i).setBackground(kingCheckmateCol);
-                                        inGame = false;
-                                        Win();
-                                    }
-                                    else if (result == MoveResult.STALEMATE)
-                                    {
-                                        blanks.get(i).setBackground(stalemateCol);
-                                        inGame = false;
-                                        Draw();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    endPos = null;
-                    selectedPiece = null;
-                } else {
-                    if (myChess.getPiece(pieceBlank.posX, pieceBlank.posY) != null) {
-                        selectedPiece = myChess.getPiece(pieceBlank.posX, pieceBlank.posY);
-                        if (selectedPiece.getTeam() == myChess.getTurn()) {
-                            startPos = new Position(pieceBlank.posX, pieceBlank.posY);
-                            List<Position> moves = myChess.getPiece(pieceBlank.posX, pieceBlank.posY).getMoves();
-                            List<PieceBlank> blanks = new ArrayList<>();
-                            for (int i = 0; i < 64; i++) {
-                                blanks.add((PieceBlank) mainPanel.getComponent(i));
-                            }
-                            for (int i = 0; i < moves.size(); i++) {
-                                for (int j = 0; j < blanks.size(); j++) {
-                                    if (blanks.get(j).posX == moves.get(i).x && blanks.get(j).posY == moves.get(i).y) {
-                                        if (myChess.getPiece(blanks.get(j).posX, blanks.get(j).posY) == null) {
-                                            blanks.get(j).setBackground(movePosCol);
-                                        } else {
-                                            blanks.get(j).setBackground(canKillCol);
-                                        }
-                                    }
-                                }
-                            }
-                            pieceBlank.setBackground(selectPieceCol);
-                        } else {
-                            selectedPiece = null;
-                        }
-                    }
-                }
-                UpdateFrame();
+                PieceMove(pieceBlank);
+
             }
             if (e.getButton() == MouseEvent.BUTTON3) {
                 startPos = null;
