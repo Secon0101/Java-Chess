@@ -1,5 +1,8 @@
 package chess;
 
+import java.util.List;
+import java.util.LinkedList;
+
 public class Chess {
     private final Board board = new Board();
     
@@ -15,6 +18,11 @@ public class Chess {
     private Piece lastMovedPiece;
     /** @see #removeIllegalMoves() */
     private final Board tempBoard = new Board();
+    /** @see #removeIllegalMoves() */
+    private final Position tempPos = new Position();
+    
+    /** {@link #move()}가 완료됐을 때 {@link MoveResult}를 받는 구독자 */
+    private List<MoveResultListener> moveResultListener = new LinkedList<>();
     
     
     public Chess() {
@@ -39,6 +47,44 @@ public class Chess {
     }
     
     
+    /** 로컬 멀티플레이(2인용) 게임을 시작한다. 이후로 {@link #move()} 메서드를 사용할 수 있다. 백 팀(아래쪽)이 선공한다.
+     * @see #startAIGame() */
+    public void startGame() {
+        startGame(Team.WHITE);
+    }
+    /** 로컬 멀티플레이(2인용) 게임을 시작한다. 이후로 {@link #move()} 메서드를 사용할 수 있다.
+     * @param firstTurn 선공하는 팀
+     * @see #startAIGame() */
+    public void startGame(Team firstTurn) {
+        turn = firstTurn;
+        playing = true;
+    }
+    
+    /** AI 대전(1인용) 게임을 시작한다. 이후로 {@link #move()} 메서드를 사용할 수 있다. 백 팀(아래쪽)이 선공한다.
+     * @param aiTeam AI의 팀. 반대편은 자동적으로 플레이어 팀이 된다.
+     * @see #startGame() */
+    public void startAIGame(Team aiTeam) {
+        startAIGame(aiTeam, Team.WHITE);
+    }
+    /** AI 대전(1인용) 게임을 시작한다. 이후로 {@link #move()} 메서드를 사용할 수 있다.
+     * @param aiTeam AI의 팀. 반대편은 자동적으로 플레이어 팀이 된다.
+     * @param firstTurn 선공하는 팀
+     * @see #startGame() */
+    public void startAIGame(Team aiTeam, Team firstTurn) {
+        turn = firstTurn;
+        playing = true;
+    }
+    
+    /** 게임을 끝낸다. 이후로 {@link #move()}를 사용할 시 {@link MoveResult#NOT_PLAYING}이 리턴된다. */
+    public void endGame() {
+        playing = false;
+    }
+    
+    public void addMoveResultListener(MoveResultListener listener) {
+        moveResultListener.add(listener);
+    }
+    
+    
     /** 어느 쪽 팀의 차례인지 반환한다. */
     public Team getTurn() { return turn; }
     /** 왼쪽 아래가 (1, 1), 오른쪽 위가 (8, 8) */
@@ -47,45 +93,10 @@ public class Chess {
     public Piece getPiece(Position pos) { return board.getPiece(pos); }
     
     
-    /** 로컬 멀티플레이(2인용) 게임을 시작한다. 이후로 {@link #move()} 메서드를 사용할 수 있다. 백 팀(아래쪽)이 선공한다.
-     * @see #startAIGame()
-     * @see #endGame() */
-    public void startGame() {
-        playing = true;
-    }
-    /** 로컬 멀티플레이(2인용) 게임을 시작한다. 이후로 {@link #move()} 메서드를 사용할 수 있다.
-     * @param firstTurn 선공하는 팀
-     * @see #startAIGame()
-     * @see #endGame() */
-    public void startGame(Team firstTurn) {
-        turn = firstTurn;
-        startGame();
-    }
-    
-    /** AI 대전(1인용) 게임을 시작한다. 이후로 {@link #move()} 메서드를 사용할 수 있다.
-     * @param aiTeam AI의 팀. 반대편은 자동적으로 플레이어 팀이 된다.
-     * @see #startGame() */
-    public void startAIGame(Team aiTeam) {
-        playing = true;
-    }
-    /** AI 대전(1인용) 게임을 시작한다. 이후로 {@link #move()} 메서드를 사용할 수 있다.
-     * @param aiTeam AI의 팀. 반대편은 자동적으로 플레이어 팀이 된다.
-     * @param firstTurn 선공하는 팀
-     * @see #startGame() */
-    public void startAIGame(Team aiTeam, Team firstTurn) {
-        turn = firstTurn;
-        startAIGame(aiTeam);
-    }
-    
-    /** 게임을 끝낸다. */
-    public void endGame() {
-        playing = false;
-    }
-    
-    
-    /** from 위치에 있는 말을 to 위치로 옮긴다.
-     * @return 이동 성공 여부 + 실패했다면 실패 원인
-     * @see MoveResult */
+    /** from 위치에 있는 말을 to 위치로 옮긴다. 이동 성공 여부 및 결과, 실패했다면 실패 원인이 담긴 {@link MoveResult}를 생성한다. 그리고 {@link MoveResultListener}에게 이벤트를 실행시키고 결과를 전달한다.
+     * @return 이동 성공 여부 및 결과, 실패했다면 실패 원인. 리턴값을 사용하지 않고 {@link MoveResultListener}를 사용하는 것을 권장한다.
+     * @see MoveResult
+     * @see #addMoveResultListener(MoveResultListener) */
     public MoveResult move(Position from, Position to) {
         if (!playing) return MoveResult.NOT_PLAYING;
         if (!inBoard(from) || !inBoard(to)) return MoveResult.OUT_OF_BOARD;
@@ -108,8 +119,15 @@ public class Chess {
         }
         lastMovedPiece = piece;
         
+        System.out.printf("%s -> %s\n", from, to); // debug
+        
         // 다음 이동 계산 + 체크 확인
         boolean check = calculateMoves(board, null);
+        if (check) {
+            System.out.println("check!"); // debug
+        }
+        
+        calculateMoves(board, null);
         
         // 턴 교체
         turn = turn == Team.BLACK ? Team.WHITE : Team.BLACK;
@@ -120,6 +138,10 @@ public class Chess {
             endGame();
         }
         System.out.println(result); // debug
+        
+        // 이동 완료 이벤트 실행
+        moveResultListener.forEach(listener -> listener.onMoved(result));
+        
         return result;
     }
     
@@ -152,16 +174,16 @@ public class Chess {
         
         // 캐슬링 (이동이 된다는 것 자체가 캐슬링 가능이므로 따로 검사는 안 함)
         if (piece instanceof King king) {
-            if (from.equals(5, 1)) {
+            if (from.equals(5, to.y)) {
                 // 킹 사이드
-                if (to.equals(7, 1)) {
+                if (to.equals(7, to.y)) {
                     Piece rook = getPiece(8, to.y);
                     board.setPiece(8, to.y, null);
                     board.setPiece(6, to.y, rook);
                     ((OnMovedListener) rook).onMoved(this);
                 }
                 // 퀸 사이드
-                else if (to.equals(3, 1)) {
+                else if (to.equals(3, to.y)) {
                     Piece rook = getPiece(1, to.y);
                     board.setPiece(1, to.y, null);
                     board.setPiece(4, to.y, rook);
@@ -209,6 +231,7 @@ public class Chess {
             System.out.printf("  piece: %s\n", piece); // debug
             
             // 말을 모든 이동 가능 위치로 이동시키고 체크 여부 확인
+            tempPos.set(piece.position);
             var iter = piece.moves.iterator();
             while (iter.hasNext()) {
                 Position to = iter.next();
@@ -230,11 +253,13 @@ public class Chess {
                 }
             }
             
+            // 롤백
+            piece.position.set(tempPos);
+            
             // 최종 이동 위치 개수 저장
             if (moveCount == 0) {
                 moveCount += piece.getMoveCount();
             }
-            System.out.println("  piece end"); // debug
         }
         System.out.println("end\n"); // debug
         
