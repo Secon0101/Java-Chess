@@ -25,24 +25,7 @@ public class MyFrame extends JFrame implements MouseListener, MoveResultListener
     Piece selectedPiece = null;
     boolean inGame;
     boolean[] kingChecked = { false, false }; //black, white
-
-    MyFrame(Chess chess) {
-        inGame = true;
-        myChess = chess;
-        SetIcons();
-        for (int i = 0; i < 12; i++) {
-            Image img = pieces[i].getImage();
-            Image changed = img.getScaledInstance(45, 45, Image.SCALE_SMOOTH);
-            pieces[i] = new ImageIcon(changed);
-        }
-
-        setTitle("♟ Chess Game ♟ 【 Turn: " + myChess.getTurn().toString() + " 】");
-        setSize(500, 500);
-        setResizable(false);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        UpdateFrame();
-    }
+    List<PieceBlank> blankList = new ArrayList<>();
 
     public void SetIcons() {
         pieces[0] = new ImageIcon("res/images/PB.png");
@@ -59,25 +42,60 @@ public class MyFrame extends JFrame implements MouseListener, MoveResultListener
         pieces[11] = new ImageIcon("res/images/KW.png");
     }
 
-    public void UpdateFrame() {
+    MyFrame(Chess chess) {
+        inGame = true;
+        myChess = chess;
+        SetIcons();
+        for (int i = 0; i < 12; i++) {
+            Image img = pieces[i].getImage();
+            Image changed = img.getScaledInstance(45, 45, Image.SCALE_SMOOTH);
+            pieces[i] = new ImageIcon(changed);
+        }
+
+        setTitle("♟ Chess Game ♟ 【 Turn: " + myChess.getTurn().toString() + " 】");
+        setSize(500, 500);
+        setResizable(false);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+
         mainPanel = new JPanel();
         mainPanel.setLayout(new GridLayout(8, 8));
         mainPanel.setBackground(Color.darkGray);
 
         for (int i = 8; i > 0; i--) {
             for (int j = 1; j <= 8; j++) {
-                Color blankCol;
                 PieceBlank blank = new PieceBlank();
+                blankList.add(blank);
 
-                if ((j + (i % 2)) % 2 == 0) blankCol = new Color(255, 255, 255);
-                else blankCol = new Color(100, 100, 100);
-
-                blank.setBackground(blankCol);
                 JLabel jl = new JLabel();
                 blank.label = jl;
                 blank.posX = j;
                 blank.posY = i;
                 jl.setSize(60, 60);
+
+                blank.add(jl);
+                mainPanel.add(blank);
+                blank.addMouseListener(this);
+            }
+        }
+        add(mainPanel);
+        setVisible(true);
+
+        UpdateFrame();
+    }
+
+    public void UpdateFrame()
+    {
+        int index = 0;
+        for (int i = 8; i > 0; i--)
+        {
+            for (int j = 1; j <= 8; j++)
+            {
+                Color blankCol;
+                if ((j + (i % 2)) % 2 == 0) blankCol = new Color(255, 255, 255);
+                else blankCol = new Color(100, 100, 100);
+
+                blankList.get(index).setBackground(blankCol);
 
                 if (myChess.getPiece(j, i) != null)
                 {
@@ -108,17 +126,18 @@ public class MyFrame extends JFrame implements MouseListener, MoveResultListener
                         plusIndex += 5;
                         if(kingChecked[curPiece.getTeam().ordinal()])
                         {
-                            blank.setBackground(kingCheckCol);
+                            blankList.get(index).setBackground(kingCheckCol);
                         }
                     }
-                    jl.setIcon(pieces[plusIndex]);
+                    blankList.get(index).label.setIcon(pieces[plusIndex]);
                 }
-                blank.add(jl);
-                mainPanel.add(blank);
-                blank.addMouseListener(this);
+                else
+                {
+                    blankList.get(index).label.setIcon(null);
+                }
+                index++;
             }
         }
-        add(mainPanel);
         setVisible(true);
     }
 
@@ -185,7 +204,6 @@ public class MyFrame extends JFrame implements MouseListener, MoveResultListener
                 }
             }
         }
-        UpdateFrame();
     }
 
     @Override
@@ -231,6 +249,7 @@ public class MyFrame extends JFrame implements MouseListener, MoveResultListener
         }
         endPos = null;
         selectedPiece = null;
+        System.out.println(myChess);
         UpdateFrame();
     }
 
