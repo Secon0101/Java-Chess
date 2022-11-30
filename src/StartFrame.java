@@ -20,6 +20,7 @@ public class StartFrame extends JFrame implements ChangeListener {
         newChess = chess;
         chessFrame = new MyFrame(newChess);
         newChess.addMoveResultListener((MoveResultListener) chessFrame);
+
         setTitle("♟ Chess Game ♟");
         setSize(500, 500);
         setResizable(false);

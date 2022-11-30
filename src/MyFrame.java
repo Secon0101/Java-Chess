@@ -53,7 +53,6 @@ public class MyFrame extends JFrame implements MouseListener, MoveResultListener
 
     MyFrame(Chess chess) {
         myChess = chess;
-
         SetIcons();
         for (int i = 0; i < 12; i++) {
             Image img = pieces[i].getImage();
