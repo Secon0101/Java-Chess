@@ -80,18 +80,12 @@ class Board {
                     sb.append("   ");
                 } else {
                     sb.append(piece.getTeam() == Team.BLACK ? "b" : "w");
-                    if (piece instanceof Pawn)
-                        sb.append("P ");
-                    else if (piece instanceof Rook)
-                        sb.append("R ");
-                    else if (piece instanceof King)
-                        sb.append("K ");
-                    else if (piece instanceof Bishop)
-                        sb.append("B ");
-                    else if (piece instanceof Knight)
-                        sb.append("N ");
-                    else if (piece instanceof Queen)
-                        sb.append("Q ");
+                    if (piece instanceof Pawn) sb.append("P ");
+                    else if (piece instanceof Rook) sb.append("R ");
+                    else if (piece instanceof King) sb.append("K ");
+                    else if (piece instanceof Bishop) sb.append("B ");
+                    else if (piece instanceof Knight) sb.append("N ");
+                    else if (piece instanceof Queen) sb.append("Q ");
                 }
             }
             sb.append(String.format("%d\n", y));
