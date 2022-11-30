@@ -37,7 +37,7 @@ class Board {
         
         // 킹이면 따로 저장
         if (piece instanceof King king) {
-            kings[king.team.value()] = king;
+            kings[king.team.ordinal()] = king;
         }
     }
     /** 왼쪽 아래가 (1, 1), 오른쪽 위가 (8, 8) */
