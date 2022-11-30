@@ -23,8 +23,8 @@ public class MyFrame extends JFrame implements MouseListener, MoveResultListener
     Position endPos;
     JPanel mainPanel;
     Piece selectedPiece = null;
-    boolean inGame;
-    boolean[] kingChecked = { false, false }; //black, white
+    MoveResult[] kingState = { null, null }; //black, white
+
     List<PieceBlank> blankList = new ArrayList<>();
 
     public void SetIcons() {
@@ -43,7 +43,6 @@ public class MyFrame extends JFrame implements MouseListener, MoveResultListener
     }
 
     MyFrame(Chess chess) {
-        inGame = true;
         myChess = chess;
         SetIcons();
         for (int i = 0; i < 12; i++) {
@@ -124,9 +123,17 @@ public class MyFrame extends JFrame implements MouseListener, MoveResultListener
                     else if (curPiece instanceof King)
                     {
                         plusIndex += 5;
-                        if(kingChecked[curPiece.getTeam().ordinal()])
+                        if(kingState[curPiece.getTeam().ordinal()] == MoveResult.CHECK)
                         {
                             blankList.get(index).setBackground(kingCheckCol);
+                        }
+                        else if(kingState[curPiece.getTeam().ordinal()] == MoveResult.CHECKMATE)
+                        {
+                            blankList.get(index).setBackground(kingCheckmateCol);
+                        }
+                        else if(kingState[curPiece.getTeam().ordinal()] == MoveResult.STALEMATE)
+                        {
+                            blankList.get(index).setBackground(stalemateCol);
                         }
                     }
                     blankList.get(index).label.setIcon(pieces[plusIndex]);
@@ -143,7 +150,7 @@ public class MyFrame extends JFrame implements MouseListener, MoveResultListener
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        if (inGame)
+        if (myChess.isPlaying())
         {
             if (e.getButton() == MouseEvent.BUTTON1)
             {
@@ -228,28 +235,28 @@ public class MyFrame extends JFrame implements MouseListener, MoveResultListener
                         if (result == MoveResult.CHECK)
                         {
                             setTitle("♟ Chess Game ♟ 【 Turn: " + myChess.getTurn().toString() + " : CHECK 】");
-                            kingChecked[myChess.getTurn().ordinal()] = true;
+                            kingState[myChess.getTurn().ordinal()] = MoveResult.CHECK;
                         }
                         else if (result == MoveResult.CHECKMATE)
                         {
-                            blanks.get(i).setBackground(kingCheckmateCol);
-                            inGame = false;
+                            kingState[myChess.getTurn().ordinal()] = MoveResult.CHECKMATE;
                             Win();
                         }
                         else
                         {
-                            blanks.get(i).setBackground(stalemateCol);
-                            inGame = false;
+                            kingState[myChess.getTurn().ordinal()] = MoveResult.STALEMATE;
                             Draw();
                         }
                     }
                 }
             }
-            kingChecked[myChess.getTurn().opponent().ordinal()] = false;
+            else
+            {
+                kingState[myChess.getTurn().ordinal()] = null;
+            }
         }
         endPos = null;
         selectedPiece = null;
-        System.out.println(myChess);
         UpdateFrame();
     }
 
