@@ -3,15 +3,11 @@ import chess.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Collections;
-import java.util.LinkedList;
 
 public class MyFrame extends JFrame implements MouseListener {
 
@@ -70,7 +66,7 @@ public class MyFrame extends JFrame implements MouseListener {
 
         for (int i = 8; i > 0; i--) {
             for (int j = 1; j <= 8; j++) {
-                Color blankCol = new Color(0, 0, 0);
+                Color blankCol;
                 PieceBlank blank = new PieceBlank();
 
                 if ((j + (i % 2)) % 2 == 0) blankCol = new Color(255, 255, 255);
@@ -110,7 +106,7 @@ public class MyFrame extends JFrame implements MouseListener {
                     else if (curPiece instanceof King)
                     {
                         plusIndex += 5;
-                        if(kingChecked[curPiece.getTeam().value()])
+                        if(kingChecked[curPiece.getTeam().ordinal()])
                         {
                             blank.setBackground(kingCheckCol);
                         }
@@ -162,7 +158,7 @@ public class MyFrame extends JFrame implements MouseListener {
                             if (result == MoveResult.CHECK)
                             {
                                 setTitle("♟ Chess Game ♟ 【 Turn: " + myChess.getTurn().toString() + " : CHECK 】");
-                                kingChecked[myChess.getTurn().value()] = true;
+                                kingChecked[myChess.getTurn().ordinal()] = true;
                             }
                             else if (result == MoveResult.CHECKMATE)
                             {
@@ -170,7 +166,7 @@ public class MyFrame extends JFrame implements MouseListener {
                                 inGame = false;
                                 Win();
                             }
-                            else if (result == MoveResult.STALEMATE)
+                            else
                             {
                                 blanks.get(i).setBackground(stalemateCol);
                                 inGame = false;
@@ -179,7 +175,7 @@ public class MyFrame extends JFrame implements MouseListener {
                         }
                     }
                 }
-                kingChecked[myChess.getTurn().opponent().value()] = false;
+                kingChecked[myChess.getTurn().opponent().ordinal()] = false;
             }
             endPos = null;
             selectedPiece = null;
@@ -246,24 +242,12 @@ public class MyFrame extends JFrame implements MouseListener {
     }
     @Override
     public void mousePressed(MouseEvent e) {
-        /*
-        PieceBlank pieceBlank = (PieceBlank)e.getSource();
-        startPos = new Position(pieceBlank.posX, pieceBlank.posY);
-         */
+
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        /*
-        if(startPos != null && endPos != null)
-        {
-            myChess.move(startPos, endPos);
-            startPos = null;
-            endPos = null;
-            UpdateFrame();
-            setTitle("♟ Chess Game ♟ 【 Turn: " + myChess.getTurn().toString() + " 】");
-        }
-        */
+
     }
 
     @Override
