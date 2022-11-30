@@ -111,17 +111,24 @@ public class Chess {
      * @see MoveResult
      * @see #addMoveResultListener(MoveResultListener) */
     public MoveResult move(Position from, Position to) {
-        if (!playing) return invokeMovedEvent(MoveResult.NOT_PLAYING);
-        if (!inBoard(from) || !inBoard(to)) return invokeMovedEvent(MoveResult.OUT_OF_BOARD);
-        if (to.equals(board.getKingPosition(turn.opponent()))) return invokeMovedEvent(MoveResult.ATTACKED_KING);
+        if (!playing)
+            return invokeMovedEvent(MoveResult.NOT_PLAYING);
+        if (!inBoard(from) || !inBoard(to))
+            return invokeMovedEvent(MoveResult.OUT_OF_BOARD);
+        if (to.equals(board.getKingPosition(turn.opponent())))
+            return invokeMovedEvent(MoveResult.ATTACKED_KING);
+        
+        Piece piece = getPiece(from);
+        if (piece == null)
+            return invokeMovedEvent(MoveResult.NO_PIECE);
+        if (piece.team != turn)
+            return invokeMovedEvent(MoveResult.INVALID_TURN);
+        if (!piece.hasMove(to))
+            return invokeMovedEvent(MoveResult.INVALID_MOVE);
         
         // 말 옮기기
-        Piece piece = getPiece(from);
-        if (piece == null) return invokeMovedEvent(MoveResult.NO_PIECE);
-        if (piece.team != turn) return invokeMovedEvent(MoveResult.INVALID_TURN);
-        if (!piece.hasMove(to)) return invokeMovedEvent(MoveResult.INVALID_MOVE);
-        
         movePiece(board, from, to);
+        System.out.printf("%s %s %s -> %s\n", turn, piece.getClass(), from, to); // debug
         
         // 이동 완료 후 처리
         if (piece instanceof OnMovedListener p) {
@@ -132,13 +139,10 @@ public class Chess {
         }
         lastMovedPiece = piece;
         
-        System.out.printf("%s %s %s -> %s\n", turn, piece.getClass(), from, to); // debug
         
         // 다음 이동 계산 + 체크 확인
         boolean check = calculateMoves(board, null);
         if (check) System.out.println("check!"); // debug
-        
-        calculateMoves(board, null);
         
         // 턴 교체
         turn = piece.team.opponent();
@@ -146,12 +150,11 @@ public class Chess {
         // 잘못된 이동 제거 + 최종 판정
         MoveResult result = removeIllegalMoves(check);
         System.out.printf("%s\n\n", result); // debug
-        
-        // 이동 완료 이벤트 실행
         if (result == MoveResult.CHECKMATE || result == MoveResult.STALEMATE) {
             endGame();
         }
         
+        // 이동 완료 이벤트 실행
         invokeMovedEvent(result);
         
         // AI 이동 처리

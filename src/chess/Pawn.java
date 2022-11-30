@@ -54,10 +54,8 @@ public class Pawn extends Piece implements OnMovedListener {
                 piece = board.getPiece(x, y);
                 if (piece == null || piece.team == team) continue;
                 
-                if (piece instanceof Pawn pawn) {
-                    if (pawn.isEnPassantTarget) {
-                        moves.add(new Position(x, y + forward));
-                    }
+                if (piece instanceof Pawn pawn && pawn.isEnPassantTarget) {
+                    moves.add(new Position(x, y + forward));
                 }
             }
         }
