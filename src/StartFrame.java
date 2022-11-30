@@ -22,7 +22,7 @@ public class StartFrame extends JFrame implements ChangeListener {
         newChess.addMoveResultListener((MoveResultListener) chessFrame);
 
         setTitle("♟ Chess Game ♟");
-        setSize(500, 500);
+        setSize(504, 504);
         setResizable(false);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
