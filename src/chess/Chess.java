@@ -128,7 +128,6 @@ public class Chess {
         
         // 말 옮기기
         movePiece(board, from, to);
-        System.out.printf("%s %s %s -> %s\n", turn, piece.getClass(), from, to); // debug
         
         // 이동 완료 후 처리
         if (piece instanceof OnMovedListener p) {
@@ -149,7 +148,6 @@ public class Chess {
         
         // 잘못된 이동 제거 + 최종 판정
         MoveResult result = removeIllegalMoves(check);
-        System.out.printf("%s\n\n", result); // debug
         if (result == MoveResult.CHECKMATE || result == MoveResult.STALEMATE) {
             endGame();
         }
@@ -242,20 +240,17 @@ public class Chess {
      * @param isCheckNow 현재 체크 상태. 체크메이트/스테일메이트 구분에 쓰인다.
      * @return 체크/체크메이트/스테일메이트라면 그에 맞는 {@link MoveResult}, 아니면 {@link MoveResult#SUCCESS} */
     private MoveResult removeIllegalMoves(boolean isCheckNow) {
-        // System.out.println("\nremoveIllegalMoves():"); // debug
         int moveCount = 0; // 말 하나를 계산한 후 최종 이동 경로의 개수 저장 (to check checkmate)
         
         // 다음에 이동할 팀의 모든 말에 대해
         for (Piece piece : board.getPieceIterator()) {
             if (piece == null || piece.team != turn) continue;
-            // System.out.printf("  piece: %s\n", piece); // debug
             
             // 말을 모든 이동 가능 위치로 이동시키고 체크 여부 확인
             tempPos.set(piece.position);
             var iter = piece.moves.iterator();
             while (iter.hasNext()) {
                 Position to = iter.next();
-                // System.out.printf("    %s - ", to); // debug
                 
                 // board를 tempBoard에 복사
                 board.copyTo(tempBoard);
@@ -267,9 +262,6 @@ public class Chess {
                 boolean check = calculateMoves(tempBoard, turn.opponent());
                 if (check) {
                     iter.remove();
-                    // System.out.println("Invalid"); // debug
-                } else {
-                    // System.out.println("Valid"); // debug
                 }
             }
             
@@ -281,7 +273,6 @@ public class Chess {
                 moveCount += piece.getMoveCount();
             }
         }
-        // System.out.println("end\n"); // debug
         
         // 현재 체크 상태, 이동 가능 위치 개수에 따라 최종 결과 리턴
         if (moveCount == 0) return isCheckNow ? MoveResult.CHECKMATE : MoveResult.STALEMATE;
