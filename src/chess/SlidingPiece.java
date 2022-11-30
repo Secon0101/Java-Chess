@@ -10,10 +10,8 @@ abstract class SlidingPiece extends Piece {
         final Position kingPos = board.getKingPosition(team.opponent());
         boolean check = false;
         
-        final Position[] directions = getDirections();
-        
         // 이동 방향으로, 상대 말을 만나서 막히기 전까지의 모든 칸을 이동 가능
-        for (Position direction : directions) {
+        for (Position direction : getDirections()) {
             int x = position.x + direction.x;
             int y = position.y + direction.y;
 
