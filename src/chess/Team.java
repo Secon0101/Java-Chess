@@ -1,6 +1,9 @@
 package chess;
 
-/** 흑(위쪽) / 백(아래쪽) */
+/** <ul>
+ *   <li> {@link #BLACK} - 흑 (위쪽, 디폴트 후공) </li>
+ *   <li> {@link #WHITE} - 백 (아래쪽, 디폴트 선공) </li>
+ * </ul> */
 public enum Team {
     /** 위쪽, 후공 */
     BLACK(0),
