@@ -18,6 +18,8 @@ public class MyFrame extends JFrame implements MouseListener, MoveResultListener
     Color kingCheckCol = new Color(220, 120, 220);
     Color kingCheckmateCol = new Color(150, 50, 150);
     Color stalemateCol = new Color(100, 150, 200);
+    Color WColor = new Color(255,255,255);
+    Color BColor = new Color(100,100,100);
     Chess myChess;
     Position startPos;
     Position endPos;
@@ -42,8 +44,16 @@ public class MyFrame extends JFrame implements MouseListener, MoveResultListener
         pieces[11] = new ImageIcon("res/images/KW.png");
     }
 
+    public void SetColor(Color colorA, Color colorB)
+    {
+        WColor = colorA;
+        BColor = colorB;
+        UpdateFrame();
+    }
+
     MyFrame(Chess chess) {
         myChess = chess;
+
         SetIcons();
         for (int i = 0; i < 12; i++) {
             Image img = pieces[i].getImage();
@@ -52,11 +62,10 @@ public class MyFrame extends JFrame implements MouseListener, MoveResultListener
         }
 
         setTitle("♟ Chess Game ♟ 【 Turn: " + myChess.getTurn().toString() + " 】");
-        setSize(500, 500);
+        setSize(504, 504);
         setResizable(false);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-
         mainPanel = new JPanel();
         mainPanel.setLayout(new GridLayout(8, 8));
         mainPanel.setBackground(Color.darkGray);
@@ -70,7 +79,7 @@ public class MyFrame extends JFrame implements MouseListener, MoveResultListener
                 blank.label = jl;
                 blank.posX = j;
                 blank.posY = i;
-                jl.setSize(60, 60);
+                jl.setSize(63, 63);
 
                 blank.add(jl);
                 mainPanel.add(blank);
@@ -88,8 +97,8 @@ public class MyFrame extends JFrame implements MouseListener, MoveResultListener
         for (int i = 8; i > 0; i--) {
             for (int j = 1; j <= 8; j++) {
                 Color blankCol;
-                if ((j + (i % 2)) % 2 == 0) blankCol = new Color(255, 255, 255);
-                else blankCol = new Color(100, 100, 100);
+                if ((j + (i % 2)) % 2 == 0) blankCol = WColor;
+                else blankCol = BColor;
 
                 blankList.get(index).setBackground(blankCol);
 

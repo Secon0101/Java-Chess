@@ -3,15 +3,23 @@ import chess.MoveResultListener;
 import chess.Team;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 
-public class StartFrame extends JFrame {
+public class StartFrame extends JFrame implements ChangeListener {
 
+    int[] colors = { 255, 255, 255, 100, 100, 100 };
     boolean choseCom = false;
+
+    MyFrame chessFrame;
+    Team AITeam;
+    Chess newChess;
     StartFrame(Chess chess)
     {
-        Frame chessFrame = new MyFrame(chess);
-        chess.addMoveResultListener((MoveResultListener) chessFrame);
+        newChess = chess;
+        chessFrame = new MyFrame(newChess);
+        newChess.addMoveResultListener((MoveResultListener) chessFrame);
         setTitle("♟ Chess Game ♟");
         setSize(500, 500);
         setResizable(false);
@@ -52,21 +60,20 @@ public class StartFrame extends JFrame {
         btn1.addActionListener(e ->{
             if(choseCom)
             {
-                setVisible(false);
-                chess.startAIGame(Team.BLACK);
+                AITeam = Team.BLACK;
+                ChooseColor(main);
             }
             else
             {
-                setVisible(false);
-                chess.startGame();
+                ChooseColor(main);
             }
         });
 
         btn2.addActionListener(e ->{
             if(choseCom)
             {
-                setVisible(false);
-                chess.startAIGame(Team.WHITE);
+                AITeam = Team.WHITE;
+                ChooseColor(main);
             }
             else
             {
@@ -74,6 +81,118 @@ public class StartFrame extends JFrame {
                 InVSCom(btn1, btn2, jl);
             }
         });
+    }
+
+    JPanel WPanel = new JPanel();
+    JPanel BPanel = new JPanel();
+    private void ChooseColor(JPanel panel)
+    {
+        panel.removeAll();
+        panel.setLayout(new GridLayout(2,2));
+        WPanel = new JPanel();
+        WPanel.setBackground(new Color(colors[0], colors[1], colors[2]));
+        BPanel = new JPanel();
+        BPanel.setBackground(new Color(colors[3], colors[4], colors[5]));
+        JPanel pl3 = new JPanel();
+        pl3.setBackground(Color.darkGray);
+        JPanel pl4 = new JPanel();
+        pl4.setBackground(Color.darkGray);
+        JLabel colorW = new JLabel("Color A");
+        JLabel colorB = new JLabel("Color B");
+        colorW.setSize(100,100);
+        colorB.setSize(100,100);
+        WPanel.add(colorW);
+        BPanel.add(colorB);
+        panel.add(WPanel);
+        panel.add(BPanel);
+        panel.add(pl3);
+        panel.add(pl4);
+        JSlider sliderWR = new JSlider(0,255,255);
+        JSlider sliderWG = new JSlider(0,255,255);
+        JSlider sliderWB = new JSlider(0,255,255);
+        sliderWR.setName("WR");
+        sliderWG.setName("WG");
+        sliderWB.setName("WB");
+        sliderWR.addChangeListener(this);
+        sliderWG.addChangeListener(this);
+        sliderWB.addChangeListener(this);
+        pl3.add(sliderWR);
+        pl3.add(sliderWG);
+        pl3.add(sliderWB);
+        JSlider sliderBR = new JSlider(0,255,100);
+        JSlider sliderBG = new JSlider(0,255,100);
+        JSlider sliderBB = new JSlider(0,255,100);
+        sliderBR.setName("BR");
+        sliderBG.setName("BG");
+        sliderBB.setName("BB");
+        sliderBR.addChangeListener(this);
+        sliderBG.addChangeListener(this);
+        sliderBB.addChangeListener(this);
+        pl4.add(sliderBR);
+        pl4.add(sliderBG);
+        pl4.add(sliderBB);
+        JButton reset = new JButton("RESET");
+        reset.addActionListener(e -> {
+            sliderWR.setValue(255);
+            sliderWG.setValue(255);
+            sliderWB.setValue(255);
+            sliderBR.setValue(100);
+            sliderBG.setValue(100);
+            sliderBB.setValue(100);
+        });
+        pl3.add(reset);
+        JButton select = new JButton("SELECT");
+        select.addActionListener(e -> {
+            SetGameColor(new Color(colors[0], colors[1], colors[2]), new Color(colors[3], colors[4], colors[5]));
+        });
+        pl4.add(select);
+        setVisible(true);
+    }
+
+    private void SetGameColor(Color W, Color B)
+    {
+        chessFrame.SetColor(W,B);
+        setVisible(false);
+        if(choseCom)
+        {
+            newChess.startAIGame(AITeam);
+        }
+        else
+        {
+            newChess.startGame();
+        }
+    }
+
+    @Override
+    public void stateChanged(ChangeEvent e) {
+        JSlider js = (JSlider)e.getSource();
+        int index = 0;
+        switch (js.getName())
+        {
+            case "WG" :
+                index = 1;
+                break;
+
+            case "WB" :
+                index = 2;
+                break;
+
+            case "BR" :
+                index = 3;
+                break;
+
+            case "BG" :
+                index = 4;
+                break;
+
+            case "BB" :
+                index = 5;
+                break;
+
+        }
+        colors[index] = js.getValue();
+        WPanel.setBackground(new Color(colors[0], colors[1], colors[2]));
+        BPanel.setBackground(new Color(colors[3], colors[4], colors[5]));
     }
 
     private void InVSCom(JButton btn1, JButton btn2, JLabel jl)
