@@ -138,10 +138,23 @@ public class Chess {
         }
         lastMovedPiece = piece;
         
-        
         // 다음 이동 계산 + 체크 확인
         boolean check = calculateMoves(board, null);
-        if (check) System.out.println("check!"); // debug
+        
+        // 스테일메이트 확인
+        if (!check) {
+            boolean stalemate = true;
+            for (Piece p : board.getPieceIterator()) {
+                if (p.getMoveCount() > 0) {
+                    stalemate = false;
+                    break;
+                }
+            }
+            if (stalemate) {
+                endGame();
+                return invokeMovedEvent(MoveResult.STALEMATE);
+            }
+        }
         
         // 턴 교체
         turn = piece.team.opponent();
