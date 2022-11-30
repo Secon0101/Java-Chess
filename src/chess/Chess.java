@@ -102,6 +102,8 @@ public class Chess {
     public Piece getPiece(int x, int y) { return board.getPiece(x, y); }
     /** 왼쪽 아래가 (1, 1), 오른쪽 위가 (8, 8) */
     public Piece getPiece(Position pos) { return board.getPiece(pos); }
+    /** 현재 게임이 진행 중이면 {@code true} */
+    public boolean isPlaying() { return playing; }
     
     
     /** from 위치에 있는 말을 to 위치로 옮긴다. 이동 성공 여부 및 결과, 실패했다면 실패 원인이 담긴 {@link MoveResult}를 생성한다. 그리고 {@link MoveResultListener}에게 이벤트를 실행시키고 결과를 전달한다.
@@ -109,15 +111,15 @@ public class Chess {
      * @see MoveResult
      * @see #addMoveResultListener(MoveResultListener) */
     public MoveResult move(Position from, Position to) {
-        if (!playing) return MoveResult.NOT_PLAYING;
-        if (!inBoard(from) || !inBoard(to)) return MoveResult.OUT_OF_BOARD;
-        if (to.equals(board.getKingPosition(turn.opponent()))) return MoveResult.ATTACKED_KING;
+        if (!playing) return invokeMovedEvent(MoveResult.NOT_PLAYING);
+        if (!inBoard(from) || !inBoard(to)) return invokeMovedEvent(MoveResult.OUT_OF_BOARD);
+        if (to.equals(board.getKingPosition(turn.opponent()))) return invokeMovedEvent(MoveResult.ATTACKED_KING);
         
         // 말 옮기기
         Piece piece = getPiece(from);
-        if (piece == null) return MoveResult.NO_PIECE;
-        if (piece.team != turn) return MoveResult.INVALID_TURN;
-        if (!piece.hasMove(to)) return MoveResult.INVALID_MOVE;
+        if (piece == null) return invokeMovedEvent(MoveResult.NO_PIECE);
+        if (piece.team != turn) return invokeMovedEvent(MoveResult.INVALID_TURN);
+        if (!piece.hasMove(to)) return invokeMovedEvent(MoveResult.INVALID_MOVE);
         
         movePiece(board, from, to);
         
@@ -134,9 +136,7 @@ public class Chess {
         
         // 다음 이동 계산 + 체크 확인
         boolean check = calculateMoves(board, null);
-        if (check) {
-            System.out.println("check!"); // debug
-        }
+        if (check) System.out.println("check!"); // debug
         
         calculateMoves(board, null);
         
@@ -145,15 +145,14 @@ public class Chess {
         
         // 잘못된 이동 제거 + 최종 판정
         MoveResult result = removeIllegalMoves(check);
-        System.out.println(result); System.out.println(); // debug
+        System.out.printf("%s\n\n", result); // debug
         
         // 이동 완료 이벤트 실행
-        moveResultListener.forEach(listener -> listener.onMoved(result));
-        
         if (result == MoveResult.CHECKMATE || result == MoveResult.STALEMATE) {
             endGame();
-            return result;
         }
+        
+        invokeMovedEvent(result);
         
         // AI 이동 처리
         if (isAITeam[turn.ordinal()]) {
@@ -284,6 +283,14 @@ public class Chess {
         // 현재 체크 상태, 이동 가능 위치 개수에 따라 최종 결과 리턴
         if (moveCount == 0) return isCheckNow ? MoveResult.CHECKMATE : MoveResult.STALEMATE;
         else return isCheckNow ? MoveResult.CHECK : MoveResult.SUCCESS;
+    }
+    
+    /** {@link #move move()} 완료 이벤트를 발생시키고 {@code result}를 보낸다.
+     * @return 인자로 들어온 {@code result}
+     */
+    private MoveResult invokeMovedEvent(MoveResult result) {
+        moveResultListener.forEach(listener -> listener.onMoved(result));
+        return result;
     }
     
     /** AI가 이동 위치를 정해서 {@link #move move()}를 실행시킨다. */
