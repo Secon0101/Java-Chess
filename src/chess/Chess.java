@@ -8,26 +8,26 @@ public class Chess {
     private final Board board = new Board();
     
     /** 현재 게임이 플레이 중이라면 {@code true}
-     * @see #startGame()
-     * @see #startAIGame()
-     * @see #endGame() */
+     * @see #startGame
+     * @see #startAIGame
+     * @see #endGame */
     private boolean playing;
     private Team turn = Team.WHITE;
-    private Team aiTeam = null;
+    /** ex) {@code isAITeam[Team.BLACK] == true} */
+    private final boolean[] isAITeam = new boolean[2];
     
     /** 바로 전 턴에 움직인 말. 앙파상 체크에 사용됨
-     *  @see #move() */
+     *  @see #move */
     private Piece lastMovedPiece;
-    /** @see #removeIllegalMoves() */
+    /** @see #removeIllegalMoves */
     private final Board tempBoard = new Board();
-    /** @see #removeIllegalMoves() */
+    /** @see #removeIllegalMoves */
     private final Position tempPos = new Position();
     private final List<Piece> aiPieces = new LinkedList<>();
     private final Random rand = new Random();
     
-    
-    /** {@link #move()}가 완료됐을 때 {@link MoveResult}를 받는 구독자 */
-    private List<MoveResultListener> moveResultListener = new LinkedList<>();
+    /** {@link #move move()}가 완료됐을 때 {@link MoveResult}를 받는 구독자 */
+    private final List<MoveResultListener> moveResultListener = new LinkedList<>();
     
     
     public Chess() {
@@ -52,40 +52,45 @@ public class Chess {
     }
     
     
-    /** 로컬 멀티플레이(2인용) 게임을 시작한다. 이후로 {@link #move()} 메서드를 사용할 수 있다. 백 팀(아래쪽)이 선공한다.
-     * @see #startAIGame() */
+    /** 로컬 멀티플레이(2인용) 게임을 시작한다. 이후로 {@link #move move()} 메서드를 사용할 수 있다. 백 팀(아래쪽)이 선공한다.
+     * @see #startAIGame */
     public void startGame() {
         startGame(Team.WHITE);
     }
-    /** 로컬 멀티플레이(2인용) 게임을 시작한다. 이후로 {@link #move()} 메서드를 사용할 수 있다.
+    /** 로컬 멀티플레이(2인용) 게임을 시작한다. 이후로 {@link #move move()} 메서드를 사용할 수 있다.
      * @param firstTurn 선공하는 팀
-     * @see #startAIGame() */
+     * @see #startAIGame */
     public void startGame(Team firstTurn) {
         turn = firstTurn;
         playing = true;
     }
     
-    /** AI 대전(1인용) 게임을 시작한다. 이후로 {@link #move()} 메서드를 사용할 수 있다. 백 팀(아래쪽)이 선공한다.
+    /** AI 대전(1인용) 게임을 시작한다. 이후로 {@link #move move()} 메서드를 사용할 수 있다. 백 팀(아래쪽)이 선공한다.
      * @param aiTeam AI의 팀. 반대편은 자동적으로 플레이어 팀이 된다.
      * @see #startGame() */
     public void startAIGame(Team aiTeam) {
         startAIGame(aiTeam, Team.WHITE);
     }
-    /** AI 대전(1인용) 게임을 시작한다. 이후로 {@link #move()} 메서드를 사용할 수 있다.
+    /** AI 대전(1인용) 게임을 시작한다. 이후로 {@link #move move()} 메서드를 사용할 수 있다.
      * @param aiTeam AI의 팀. 반대편은 자동적으로 플레이어 팀이 된다.
      * @param firstTurn 선공하는 팀
      * @see #startGame() */
     public void startAIGame(Team aiTeam, Team firstTurn) {
         turn = firstTurn;
-        this.aiTeam = aiTeam;
+        isAITeam[aiTeam.ordinal()] = true;
         playing = true;
+        
+        if (turn == aiTeam) {
+            aiMove();
+        }
     }
     
-    /** 게임을 끝낸다. 이후로 {@link #move()}를 사용할 시 {@link MoveResult#NOT_PLAYING}이 리턴된다. */
+    /** 게임을 끝낸다. 이후로 {@link #move move()}를 사용할 시 {@link MoveResult#NOT_PLAYING}이 리턴된다. */
     public void endGame() {
         playing = false;
     }
     
+    /** {@link #move move()}가 완료됐을 때 {@link MoveResult}를 받는 리스너를 구독한다. */
     public void addMoveResultListener(MoveResultListener listener) {
         moveResultListener.add(listener);
     }
@@ -136,32 +141,23 @@ public class Chess {
         calculateMoves(board, null);
         
         // 턴 교체
-        turn = turn == Team.BLACK ? Team.WHITE : Team.BLACK;
+        turn = piece.team.opponent();
         
         // 잘못된 이동 제거 + 최종 판정
         MoveResult result = removeIllegalMoves(check);
-        if (result == MoveResult.CHECKMATE || result == MoveResult.STALEMATE) {
-            endGame();
-        }
         System.out.println(result); System.out.println(); // debug
         
         // 이동 완료 이벤트 실행
         moveResultListener.forEach(listener -> listener.onMoved(result));
         
+        if (result == MoveResult.CHECKMATE || result == MoveResult.STALEMATE) {
+            endGame();
+            return result;
+        }
+        
         // AI 이동 처리
-        if (aiTeam == turn) {
-            // 랜덤 이동
-            aiPieces.clear();
-            for (Piece p : board.getPieceIterator()) {
-                if (p.team != aiTeam || p.getMoveCount() == 0) continue;
-                aiPieces.add(p);
-            }
-            
-            if (aiPieces.size() > 0) {
-                Piece p = aiPieces.get(rand.nextInt(aiPieces.size()));
-                Position pTo = p.moves.get(rand.nextInt(p.getMoveCount()));
-                move(p.position.copy(), pTo);
-            }
+        if (isAITeam[turn.ordinal()]) {
+            aiMove();
         }
         
         return result;
@@ -195,7 +191,7 @@ public class Chess {
         board.setPiece(to, piece);
         
         // 캐슬링 (이동이 된다는 것 자체가 캐슬링 가능이므로 따로 검사는 안 함)
-        if (piece instanceof King king) {
+        if (piece instanceof King) {
             if (from.equals(5, to.y)) {
                 // 킹 사이드
                 if (to.equals(7, to.y)) {
@@ -288,6 +284,25 @@ public class Chess {
         // 현재 체크 상태, 이동 가능 위치 개수에 따라 최종 결과 리턴
         if (moveCount == 0) return isCheckNow ? MoveResult.CHECKMATE : MoveResult.STALEMATE;
         else return isCheckNow ? MoveResult.CHECK : MoveResult.SUCCESS;
+    }
+    
+    /** AI가 이동 위치를 정해서 {@link #move move()}를 실행시킨다. */
+    private void aiMove() {
+        if (!isAITeam[turn.ordinal()]) return;
+        
+        aiPieces.clear();
+        for (Piece p : board.getPieceIterator()) {
+            if (p.team != turn || p.getMoveCount() == 0)
+                continue;
+            aiPieces.add(p);
+        }
+        
+        // 랜덤 이동
+        if (aiPieces.size() > 0) {
+            Piece p = aiPieces.get(rand.nextInt(aiPieces.size()));
+            Position pTo = p.moves.get(rand.nextInt(p.getMoveCount()));
+            move(p.position.copy(), pTo);
+        }
     }
     
     

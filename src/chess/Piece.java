@@ -21,8 +21,6 @@ public abstract class Piece {
     
     /** 말의 팀을 리턴한다. */
     public Team getTeam() { return team; }
-    /** 말의 위치를 리턴한다. */
-    public Position gePosition() { return position; }
     /** 말이 이동 가능한 모든 위치 리스트를 리턴한다. ({@link Collections#unmodifiableList 불변 리스트}) */
     public List<Position> getMoves() { return Collections.unmodifiableList(moves); }
     /** 말의 이동 가능 위치의 개수를 리턴한다. */
@@ -32,7 +30,7 @@ public abstract class Piece {
      * <p> 하는 김에 체크 여부도 계산한다. </p>
      * @param board 위치를 계산할 보드. 현재 플레이 중인 체스 보드일 수도 있고, 이동 위치 유효성을 체크하기 위한 임시 보드일 수도 있다.
      * @return 체크 여부
-     * @implSpec {@code moves.clear()} 이후 {@code moves}에 적절한 {@code Position}들을 계산해서 넣는다. */
+     * @implSpec {@code moves.clear()} 이후 {@link #moves}에 적절한 {@link Position}들을 계산해서 넣는다. */
     abstract boolean calculateMoves(Board board);
     
     /** 그 위치로 이동 가능하다면 true, 아니면 false ({@code List.contains(pos)}) */

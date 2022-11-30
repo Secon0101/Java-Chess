@@ -1,7 +1,7 @@
 package chess;
 
 /**
- * {@link Chess#move() move()}의 성공 및 체크 등의 여부, 실패했다면 실패 원인을 표시하는 열거형
+ * {@link Chess#move move()}의 성공 및 체크 등의 여부, 실패했다면 실패 원인을 표시하는 열거형
  * <ul>
  *   <li>{@link #NOT_PLAYING} - 게임이 시작되지 않음</li>
  *   <li>{@link #OUT_OF_BOARD} - 좌표가 체스판을 벗어남</li>

@@ -13,10 +13,10 @@ abstract class SlidingPiece extends Piece {
         final Position[] directions = getDirections();
         
         // 이동 방향으로, 상대 말을 만나서 막히기 전까지의 모든 칸을 이동 가능
-        for (int i = 0; i < directions.length; i++) {
-            int x = position.x + directions[i].x;
-            int y = position.y + directions[i].y;
-            
+        for (Position direction : directions) {
+            int x = position.x + direction.x;
+            int y = position.y + direction.y;
+
             while (Chess.inBoard(x, y)) {
                 Piece piece = board.getPiece(x, y);
                 if (piece == null) {
@@ -29,8 +29,8 @@ abstract class SlidingPiece extends Piece {
                     }
                     break;
                 }
-                x += directions[i].x;
-                y += directions[i].y;
+                x += direction.x;
+                y += direction.y;
             }
         }
         

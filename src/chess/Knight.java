@@ -5,7 +5,7 @@ public class Knight extends Piece {
     Knight(Team team, Position position) {
         super(team, position);
     }
-
+    
     @Override
     boolean calculateMoves(Board board) {
         moves.clear();
