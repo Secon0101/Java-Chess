@@ -9,7 +9,7 @@ import java.util.Iterator;
  * 이 둘을 모두 활용하기 위해 만든 클래스이다. </p> */
 class Board {
     private final Piece[][] board = new Piece[8][8];
-    protected final List<Piece> pieces = new LinkedList<>();
+    private final List<Piece> pieces = new LinkedList<>();
     private final King[] kings = new King[Team.values().length];
     
     
