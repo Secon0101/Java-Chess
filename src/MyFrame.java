@@ -230,7 +230,6 @@ public class MyFrame extends JFrame implements MouseListener {
             {
                 PieceBlank pieceBlank = (PieceBlank) e.getSource();
                 PieceMove(pieceBlank);
-
             }
             if (e.getButton() == MouseEvent.BUTTON3) {
                 startPos = null;

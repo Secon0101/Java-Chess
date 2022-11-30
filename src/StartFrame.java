@@ -1,10 +1,12 @@
 import chess.Chess;
+import chess.Team;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class StartFrame extends JFrame {
 
+    boolean choseCom = false;
     StartFrame(Chess chess) {
         setTitle("♟ Chess Game ♟");
         setSize(500, 500);
@@ -31,28 +33,54 @@ public class StartFrame extends JFrame {
         sub2.setBackground(Color.darkGray);
         FlowLayout fl2 = new FlowLayout(FlowLayout.CENTER,50,100);
         sub2.setLayout(fl2);
-        JButton btn = new JButton("Player VS Player");
-        btn.setBackground(Color.lightGray);
+        JButton btn1 = new JButton("Player VS Player");
+        btn1.setBackground(Color.lightGray);
         JButton btn2 = new JButton("Player VS Computer");
         btn2.setBackground(Color.lightGray);
 
-        sub2.add(btn);
+        sub2.add(btn1);
         sub2.add(btn2);
         main.add(sub1);
         main.add(sub2);
         add(main);
         setVisible(true);
 
-        btn.addActionListener(e ->{
-            setVisible(false);
-            new MyFrame(chess);
-            chess.startGame();
+        btn1.addActionListener(e ->{
+            if(choseCom)
+            {
+                setVisible(false);
+                new MyFrame(chess);
+                chess.startAIGame(Team.BLACK);
+            }
+            else
+            {
+                setVisible(false);
+                new MyFrame(chess);
+                chess.startGame();
+            }
         });
 
         btn2.addActionListener(e ->{
-            setVisible(false);
-            new MyFrame(chess);
-            //chess.startAIGame();
+            if(choseCom)
+            {
+                setVisible(false);
+                new MyFrame(chess);
+                chess.startAIGame(Team.WHITE);
+            }
+            else
+            {
+                choseCom = true;
+                InVSCom(btn1, btn2);
+            }
         });
+    }
+
+    private void InVSCom(JButton btn1, JButton btn2)
+    {
+        btn1.setText("WHITE");
+        btn1.setForeground(new Color(255,255,255));
+        btn2.setText("BLACK");
+        btn2.setForeground(new Color(0));
+        setVisible(true);
     }
 }
