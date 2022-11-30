@@ -70,17 +70,18 @@ public class StartFrame extends JFrame {
             else
             {
                 choseCom = true;
-                InVSCom(btn1, btn2);
+                InVSCom(btn1, btn2, jl);
             }
         });
     }
 
-    private void InVSCom(JButton btn1, JButton btn2)
+    private void InVSCom(JButton btn1, JButton btn2, JLabel jl)
     {
         btn1.setText("WHITE");
         btn1.setForeground(new Color(255,255,255));
         btn2.setText("BLACK");
         btn2.setForeground(new Color(0));
+        jl.setText("CHOOSE COLOR");
         setVisible(true);
     }
 }

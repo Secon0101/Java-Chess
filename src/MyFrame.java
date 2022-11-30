@@ -9,7 +9,7 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MyFrame extends JFrame implements MouseListener {
+public class MyFrame extends JFrame implements MouseListener, MoveResultListener {
 
     ImageIcon[] pieces = new ImageIcon[12];
     Color selectPieceCol = new Color(153,255,102);
@@ -139,46 +139,7 @@ public class MyFrame extends JFrame implements MouseListener {
         {
             endPos = new Position(selectedPieceBlank.posX, selectedPieceBlank.posY);
             MoveResult result = myChess.move(startPos, endPos);
-            if (result == MoveResult.SUCCESS || result == MoveResult.CHECK || result == MoveResult.CHECKMATE || result == MoveResult.STALEMATE)
-            {
-                startPos = null;
-                setTitle("♟ Chess Game ♟ 【 Turn: " + myChess.getTurn().toString() + " 】");
-                if (result != MoveResult.SUCCESS)
-                {
-                    List<PieceBlank> blanks = new ArrayList<>();
-                    for (int i = 0; i < 64; i++)
-                    {
-                        blanks.add((PieceBlank) mainPanel.getComponent(i));
-                    }
-                    for (int i = 0; i < blanks.size(); i++)
-                    {
-                        Piece tempPiece = myChess.getPiece(blanks.get(i).posX, blanks.get(i).posY);
-                        if (tempPiece instanceof King && tempPiece.getTeam() == myChess.getTurn())
-                        {
-                            if (result == MoveResult.CHECK)
-                            {
-                                setTitle("♟ Chess Game ♟ 【 Turn: " + myChess.getTurn().toString() + " : CHECK 】");
-                                kingChecked[myChess.getTurn().ordinal()] = true;
-                            }
-                            else if (result == MoveResult.CHECKMATE)
-                            {
-                                blanks.get(i).setBackground(kingCheckmateCol);
-                                inGame = false;
-                                Win();
-                            }
-                            else
-                            {
-                                blanks.get(i).setBackground(stalemateCol);
-                                inGame = false;
-                                Draw();
-                            }
-                        }
-                    }
-                }
-                kingChecked[myChess.getTurn().opponent().ordinal()] = false;
-            }
-            endPos = null;
-            selectedPiece = null;
+            onMoved(result);
         }
         else
         {
@@ -223,6 +184,51 @@ public class MyFrame extends JFrame implements MouseListener {
     }
 
     @Override
+    public void onMoved(MoveResult result)
+    {
+        if (result == MoveResult.SUCCESS || result == MoveResult.CHECK || result == MoveResult.CHECKMATE || result == MoveResult.STALEMATE)
+        {
+            startPos = null;
+            setTitle("♟ Chess Game ♟ 【 Turn: " + myChess.getTurn().toString() + " 】");
+            if (result != MoveResult.SUCCESS)
+            {
+                List<PieceBlank> blanks = new ArrayList<>();
+                for (int i = 0; i < 64; i++)
+                {
+                    blanks.add((PieceBlank) mainPanel.getComponent(i));
+                }
+                for (int i = 0; i < blanks.size(); i++)
+                {
+                    Piece tempPiece = myChess.getPiece(blanks.get(i).posX, blanks.get(i).posY);
+                    if (tempPiece instanceof King && tempPiece.getTeam() == myChess.getTurn())
+                    {
+                        if (result == MoveResult.CHECK)
+                        {
+                            setTitle("♟ Chess Game ♟ 【 Turn: " + myChess.getTurn().toString() + " : CHECK 】");
+                            kingChecked[myChess.getTurn().ordinal()] = true;
+                        }
+                        else if (result == MoveResult.CHECKMATE)
+                        {
+                            blanks.get(i).setBackground(kingCheckmateCol);
+                            inGame = false;
+                            Win();
+                        }
+                        else
+                        {
+                            blanks.get(i).setBackground(stalemateCol);
+                            inGame = false;
+                            Draw();
+                        }
+                    }
+                }
+            }
+            kingChecked[myChess.getTurn().opponent().ordinal()] = false;
+        }
+        endPos = null;
+        selectedPiece = null;
+    }
+
+    @Override
     public void mouseClicked(MouseEvent e) {
         if (inGame)
         {
@@ -256,6 +262,7 @@ public class MyFrame extends JFrame implements MouseListener {
     @Override
     public void mouseExited(MouseEvent e) {
     }
+
 }
 
 
