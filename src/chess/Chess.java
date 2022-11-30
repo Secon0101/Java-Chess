@@ -11,24 +11,23 @@ public class Chess {
     private Piece lastMovedPiece;
     /** @see #removeIllegalMoves() */
     private final Board tempBoard = new Board();
-    /** @see #removeIllegalMoves() */
-    private final Position tempPos = new Position();
     
     
     public Chess() {
         // 말 놓기
         for (int y = 8; y >= 1; y -= 7) {
             Team team = y == 8 ? Team.BLACK : Team.WHITE;
-            placePiece(new Rook(team, new Position(1, y)));
-            placePiece(new Knight(team, new Position(2, y)));
-            placePiece(new Bishop(team, new Position(3, y)));
-            placePiece(new Queen(team, new Position(4, y)));
-            placePiece(new King(team, new Position(5, y)));
-            placePiece(new Bishop(team, new Position(6, y)));
-            placePiece(new Knight(team, new Position(7, y)));
-            placePiece(new Rook(team, new Position(8, y)));
+            board.setPiece(1, y, new Rook(team, new Position(1, y)));
+            board.setPiece(2, y, new Knight(team, new Position(2, y)));
+            board.setPiece(3, y, new Bishop(team, new Position(3, y)));
+            board.setPiece(4, y, new Queen(team, new Position(4, y)));
+            board.setPiece(5, y, new King(team, new Position(5, y)));
+            board.setPiece(6, y, new Bishop(team, new Position(6, y)));
+            board.setPiece(7, y, new Knight(team, new Position(7, y)));
+            board.setPiece(8, y, new Rook(team, new Position(8, y)));
             for (int x = 1; x <= 8; x++) {
-                placePiece(new Pawn(team, new Position(x, y == 8 ? 7 : 2)));
+                int py = y == 8 ? 7 : 2;
+                board.setPiece(x, py, new Pawn(team, new Position(x, py)));
             }
         }
         
@@ -71,10 +70,43 @@ public class Chess {
         if (!inBoard(from) || !inBoard(to)) return MoveResult.OUT_OF_BOARD;
         if (to.equals(board.getKingPosition(turn.opponent()))) return MoveResult.ATTACKED_KING;
         
+        // 말 옮기기
         Piece piece = getPiece(from);
         if (piece == null) return MoveResult.NO_PIECE;
         if (piece.team != turn) return MoveResult.INVALID_TURN;
         if (!piece.hasMove(to)) return MoveResult.INVALID_MOVE;
+        
+        movePiece(board, from, to);
+        
+        // 이동 완료 후 처리
+        if (piece instanceof OnMovedListener p) {
+            p.onMoved(this);
+        }
+        if (lastMovedPiece != null && lastMovedPiece instanceof Pawn pawn) {
+            pawn.isEnPassantTarget = false;
+        }
+        lastMovedPiece = piece;
+        
+        // 다음 이동 계산 + 체크 확인
+        boolean check = calculateMoves(board, null);
+        
+        // 턴 교체
+        turn = turn == Team.BLACK ? Team.WHITE : Team.BLACK;
+        
+        // 잘못된 이동 제거 + 최종 판정
+        MoveResult result = removeIllegalMoves(check);
+        if (result == MoveResult.CHECKMATE || result == MoveResult.STALEMATE) {
+            endGame();
+        }
+        System.out.println(result); // debug
+        return result;
+    }
+    
+    
+    /** 보드의 from 위치에 있는 말을 to 위치로 옮긴다. 캐슬링, 앙파상, 프로모션도 적용한다. */
+    private void movePiece(Board board, Position from, Position to) {
+        Piece piece = getPiece(from);
+        if (piece == null || !piece.hasMove(to)) return;
         
         // 앙파상 (폰이 대각선 이동했는데 공격할 말이 없는 경우)
         if (piece instanceof Pawn pawn) {
@@ -107,29 +139,11 @@ public class Chess {
             }
         }
         
-        // 이동 완료 후 처리
-        if (piece instanceof OnMovedListener p) {
-            p.onMoved(this);
+        // 프로모션
+        if (piece instanceof Pawn && piece.position.y == (piece.team == Team.BLACK ? 1 : 8)) {
+            board.setPiece(piece.position, new Queen(piece.team, piece.position));
         }
-        if (lastMovedPiece != null && lastMovedPiece instanceof Pawn pawn) {
-            pawn.wasMovedRightBefore = false;
-        }
-        lastMovedPiece = piece;
-        
-        // 다음 이동 계산 + 체크 확인
-        boolean check = calculateMoves(board, null);
-        
-        // 턴 교체
-        turn = turn == Team.BLACK ? Team.WHITE : Team.BLACK;
-        
-        // 잘못된 이동 제거 + 최종 판정
-        MoveResult result = removeIllegalMoves(check);
-        if (result == MoveResult.CHECKMATE || result == MoveResult.STALEMATE) {
-            endGame();
-        }
-        return result;
     }
-    
     
     /** 주어진 판 위에 있는 모든 말들의 현재 이동 가능 위치를 계산해서, 그 말에 저장해 놓는다. 특정한 팀만 계산할 수도 있다.
      * <p> 하는 김에 체크 여부도 계산한다. </p>
@@ -155,33 +169,25 @@ public class Chess {
      * @param isCheckNow 현재 체크 상태. 체크메이트/스테일메이트 구분에 쓰인다.
      * @return 체크/체크메이트/스테일메이트라면 그에 맞는 {@link MoveResult}, 아니면 {@link MoveResult#SUCCESS} */
     private MoveResult removeIllegalMoves(boolean isCheckNow) {
-        // board를 tempBoard에 복사
-        for (int i = 1; i <= 8; i++) {
-            for (int j = 1; j <= 8; j++) {
-                tempBoard.setPiece(i, j, board.getPiece(i, j));
-            }
-        }
-        
         System.out.println("\nremoveIllegalMoves():"); // debug
         int moveCount = 0; // 말 하나를 계산한 후 최종 이동 경로의 개수 저장 (to check checkmate)
         
         // 다음에 이동할 팀의 모든 말에 대해
         for (Piece piece : board.getPieceIterator()) {
             if (piece == null || piece.team != turn) continue;
-            
             System.out.printf("  piece: %s\n", piece); // debug
             
             // 말을 모든 이동 가능 위치로 이동시키고 체크 여부 확인
-            tempPos.set(piece.position); // 이전 위치 백업
             var iter = piece.moves.iterator();
             while (iter.hasNext()) {
                 Position to = iter.next();
                 System.out.printf("    %s - ", to); // debug
                 
+                // board를 tempBoard에 복사
+                board.copyTo(tempBoard);
+                
                 // 이동
-                tempBoard.setPiece(piece.position, null);
-                Piece tempPiece = tempBoard.getPiece(to); // 롤백하려고 얻어놓음
-                tempBoard.setPiece(to, piece);
+                movePiece(tempBoard, piece.position, to);
                 
                 // 체크라면 이동 가능 위치 제거
                 boolean check = calculateMoves(tempBoard, turn.opponent());
@@ -191,16 +197,13 @@ public class Chess {
                 } else {
                     System.out.println("Valid"); // debug
                 }
-                
-                // 다시 원래대로
-                tempBoard.setPiece(to, tempPiece);
-                tempBoard.setPiece(tempPos, piece);
             }
             
             // 최종 이동 위치 개수 저장
             if (moveCount == 0) {
                 moveCount += piece.getMoveCount();
             }
+            System.out.println("  piece end"); // debug
         }
         System.out.println("end\n"); // debug
         
@@ -209,17 +212,8 @@ public class Chess {
         else return isCheckNow ? MoveResult.CHECK : MoveResult.SUCCESS;
     }
     
-    /** 말을 보드 위에 놓는다. */
-    private void placePiece(Piece piece) {
-        board.setPiece(piece.position, piece);
-    }
     
-    /** 폰을 퀸으로 승격시킨다. */
-    void promote(Pawn pawn) {
-        placePiece(new Queen(pawn.team, pawn.position));
-    }
-    
-    
-    /** {@code board.toString()} */
-    public String boardToString() { return board.toString(); }
+    /** @see Board#toString() */
+    @Override
+    public String toString() { return board.toString(); }
 }

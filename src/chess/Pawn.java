@@ -7,8 +7,8 @@ public class Pawn extends Piece implements OnMovedListener {
     private final int forward = team == Team.BLACK ? -1 : 1;
     /** 한 번도 움직이지 않았다면 {@code true}, 이때 폰은 앞으로 2칸까지 움직일 수 있다. {@link #onMoved}가 실행될 때 {@code false}가 된다. */
     private boolean isFirstMove = true;
-    /** 바로 전 턴에 움직인 말이라면 {@code true}. {@link #onMoved}가 실행될 때 {@code true}가 되고, {@link Chess#move()} 실행 이후 {@code false}가 된다. 앙파상 체크용. */
-    boolean wasMovedRightBefore = false;
+    /** 앙파상 룰에 의해 잡힐 수 있는 말이라면 {@code true}. {@link #isFirstMove}일 때 {@link #onMoved}가 실행되면 {@code true}가 된다. 그리고 다음 턴에 {@link Chess} 쪽에서 {@code false}로 바꾼다. */
+    boolean isEnPassantTarget = false;
     
     
     /** 폰의 전진 방향을 리턴한다. */
@@ -55,7 +55,7 @@ public class Pawn extends Piece implements OnMovedListener {
                 if (piece == null || piece.team == team) continue;
                 
                 if (piece instanceof Pawn pawn) {
-                    if (pawn.wasMovedRightBefore) {
+                    if (pawn.isEnPassantTarget) {
                         moves.add(new Position(x, y + forward));
                     }
                 }
@@ -67,12 +67,8 @@ public class Pawn extends Piece implements OnMovedListener {
     
     @Override
     public void onMoved(Chess chess) { // OnMovedListener
+        if (isFirstMove)
+            isEnPassantTarget = true;
         isFirstMove = false;
-        wasMovedRightBefore = true;
-        
-        // 프로모션
-        if (position.y == (team == Team.BLACK ? 1 : 8)) {
-            chess.promote(this);
-        }
     }
 }
