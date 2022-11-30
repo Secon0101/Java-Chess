@@ -2,10 +2,8 @@ import chess.Chess;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
-public class StartFrame extends JFrame implements MouseListener {
+public class StartFrame extends JFrame {
 
     StartFrame(Chess chess) {
         setTitle("♟ Chess Game ♟");
@@ -17,6 +15,7 @@ public class StartFrame extends JFrame implements MouseListener {
         main.setBackground(Color.darkGray);
         GridLayout gl = new GridLayout(2,1);
         main.setLayout(gl);
+
         JPanel sub1 = new JPanel();
         sub1.setBackground(Color.darkGray);
         FlowLayout fl = new FlowLayout(FlowLayout.CENTER,0,100);
@@ -27,6 +26,7 @@ public class StartFrame extends JFrame implements MouseListener {
         jl.setForeground(new Color(255,255,255));
         jl.setBackground(Color.darkGray);
         sub1.add(jl);
+
         JPanel sub2 = new JPanel();
         sub2.setBackground(Color.darkGray);
         FlowLayout fl2 = new FlowLayout(FlowLayout.CENTER,50,100);
@@ -35,6 +35,7 @@ public class StartFrame extends JFrame implements MouseListener {
         btn.setBackground(Color.lightGray);
         JButton btn2 = new JButton("Player VS Computer");
         btn2.setBackground(Color.lightGray);
+
         sub2.add(btn);
         sub2.add(btn2);
         main.add(sub1);
@@ -49,32 +50,9 @@ public class StartFrame extends JFrame implements MouseListener {
         });
 
         btn2.addActionListener(e ->{
-            //인간 대 인공지능
+            setVisible(false);
+            new MyFrame(chess);
+            //chess.startAIGame();
         });
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-
     }
 }
