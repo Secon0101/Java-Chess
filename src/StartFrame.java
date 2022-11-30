@@ -117,8 +117,17 @@ public class StartFrame extends JFrame implements ChangeListener {
         sliderWR.addChangeListener(this);
         sliderWG.addChangeListener(this);
         sliderWB.addChangeListener(this);
+        JLabel WRValue = new JLabel("Red Value :");
+        JLabel WGValue = new JLabel("Green Value :");
+        JLabel WBValue = new JLabel("Blue Value :");
+        WRValue.setForeground(Color.WHITE);
+        WGValue.setForeground(Color.WHITE);
+        WBValue.setForeground(Color.WHITE);
+        pl3.add(WRValue);
         pl3.add(sliderWR);
+        pl3.add(WGValue);
         pl3.add(sliderWG);
+        pl3.add(WBValue);
         pl3.add(sliderWB);
         JSlider sliderBR = new JSlider(0,255,100);
         JSlider sliderBG = new JSlider(0,255,100);
@@ -129,8 +138,17 @@ public class StartFrame extends JFrame implements ChangeListener {
         sliderBR.addChangeListener(this);
         sliderBG.addChangeListener(this);
         sliderBB.addChangeListener(this);
+        JLabel BRValue = new JLabel("Red Value :");
+        JLabel BGValue = new JLabel("Green Value :");
+        JLabel BBValue = new JLabel("Blue Value :");
+        BRValue.setForeground(Color.WHITE);
+        BGValue.setForeground(Color.WHITE);
+        BBValue.setForeground(Color.WHITE);
+        pl4.add(BRValue);
         pl4.add(sliderBR);
+        pl4.add(BGValue);
         pl4.add(sliderBG);
+        pl4.add(BBValue);
         pl4.add(sliderBB);
         JButton reset = new JButton("RESET");
         reset.addActionListener(e -> {
