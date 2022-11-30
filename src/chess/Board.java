@@ -37,7 +37,7 @@ class Board {
         
         // 킹이면 따로 저장
         if (piece instanceof King king) {
-            kings[king.team.ordinal()] = king;
+            kings[king.team.value()] = king;
         }
     }
     /** 왼쪽 아래가 (1, 1), 오른쪽 위가 (8, 8) */
@@ -56,6 +56,16 @@ class Board {
             return pieces.iterator();
         }
     };
+    
+    /** 이 보드의 상태를 to로 복사한다. 
+     * @param to 덮어씌워질 보드 */
+    void copyTo(Board to) {
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                to.setPiece(i, j, getPiece(i, j));
+            }
+        }
+    }
     
     
     @Override
