@@ -9,7 +9,7 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MyFrame extends JFrame implements MouseListener, MoveResultListener {
+public class MyFrame extends JFrame implements MouseListener, MoveResultListener{
 
     ImageIcon[] pieces = new ImageIcon[12];
     Color selectPieceCol = new Color(153,255,102);
@@ -144,8 +144,7 @@ public class MyFrame extends JFrame implements MouseListener, MoveResultListener
         if (selectedPiece != null)
         {
             endPos = new Position(selectedPieceBlank.posX, selectedPieceBlank.posY);
-            MoveResult result = myChess.move(startPos, endPos);
-            onMoved(result);
+            myChess.move(startPos, endPos);
         }
         else
         {
@@ -232,6 +231,7 @@ public class MyFrame extends JFrame implements MouseListener, MoveResultListener
         }
         endPos = null;
         selectedPiece = null;
+        UpdateFrame();
     }
 
     private void Win()

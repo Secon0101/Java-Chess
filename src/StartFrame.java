@@ -1,4 +1,5 @@
 import chess.Chess;
+import chess.MoveResultListener;
 import chess.Team;
 
 import javax.swing.*;
@@ -7,7 +8,10 @@ import java.awt.*;
 public class StartFrame extends JFrame {
 
     boolean choseCom = false;
-    StartFrame(Chess chess) {
+    StartFrame(Chess chess)
+    {
+        Frame chessFrame = new MyFrame(chess);
+        chess.addMoveResultListener((MoveResultListener) chessFrame);
         setTitle("♟ Chess Game ♟");
         setSize(500, 500);
         setResizable(false);
@@ -49,13 +53,11 @@ public class StartFrame extends JFrame {
             if(choseCom)
             {
                 setVisible(false);
-                new MyFrame(chess);
                 chess.startAIGame(Team.BLACK);
             }
             else
             {
                 setVisible(false);
-                new MyFrame(chess);
                 chess.startGame();
             }
         });
@@ -64,7 +66,6 @@ public class StartFrame extends JFrame {
             if(choseCom)
             {
                 setVisible(false);
-                new MyFrame(chess);
                 chess.startAIGame(Team.WHITE);
             }
             else
