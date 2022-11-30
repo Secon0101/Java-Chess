@@ -9,21 +9,21 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MyFrame extends JFrame implements MouseListener, MoveResultListener{
+public class MyFrame extends JFrame implements MouseListener, MoveResultListener {
 
     ImageIcon[] pieces = new ImageIcon[12];
-    Color selectPieceCol = new Color(153,255,102);
-    Color movePosCol = new Color(255,200,100);
-    Color canKillCol = new Color(255, 100,100);
-    Color kingCheckCol = new Color(220,120,220);
-    Color kingCheckmateCol = new Color(150,50,150);
-    Color stalemateCol = new Color(100,150,200);
+    Color selectPieceCol = new Color(153, 255, 102);
+    Color movePosCol = new Color(255, 200, 100);
+    Color canKillCol = new Color(255, 100, 100);
+    Color kingCheckCol = new Color(220, 120, 220);
+    Color kingCheckmateCol = new Color(150, 50, 150);
+    Color stalemateCol = new Color(100, 150, 200);
     Chess myChess;
     Position startPos;
     Position endPos;
     JPanel mainPanel;
     Piece selectedPiece = null;
-    MoveResult[] kingState = { null, null }; //black, white
+    MoveResult[] kingState = {null, null}; //black, white
 
     List<PieceBlank> blankList = new ArrayList<>();
 
@@ -83,63 +83,42 @@ public class MyFrame extends JFrame implements MouseListener, MoveResultListener
         UpdateFrame();
     }
 
-    public void UpdateFrame()
-    {
+    public void UpdateFrame() {
         int index = 0;
-        for (int i = 8; i > 0; i--)
-        {
-            for (int j = 1; j <= 8; j++)
-            {
+        for (int i = 8; i > 0; i--) {
+            for (int j = 1; j <= 8; j++) {
                 Color blankCol;
                 if ((j + (i % 2)) % 2 == 0) blankCol = new Color(255, 255, 255);
                 else blankCol = new Color(100, 100, 100);
 
                 blankList.get(index).setBackground(blankCol);
 
-                if (myChess.getPiece(j, i) != null)
-                {
+                if (myChess.getPiece(j, i) != null) {
                     Piece curPiece = myChess.getPiece(j, i);
                     int plusIndex = 0;
-                    if (curPiece.getTeam() == Team.WHITE)
-                    {
+                    if (curPiece.getTeam() == Team.WHITE) {
                         plusIndex = 6;
                     }
-                    if (curPiece instanceof Rook)
-                    {
+                    if (curPiece instanceof Rook) {
                         plusIndex += 1;
-                    }
-                    else if (curPiece instanceof Knight)
-                    {
+                    } else if (curPiece instanceof Knight) {
                         plusIndex += 2;
-                    }
-                    else if (curPiece instanceof Bishop)
-                    {
+                    } else if (curPiece instanceof Bishop) {
                         plusIndex += 3;
-                    }
-                    else if (curPiece instanceof Queen)
-                    {
+                    } else if (curPiece instanceof Queen) {
                         plusIndex += 4;
-                    }
-                    else if (curPiece instanceof King)
-                    {
+                    } else if (curPiece instanceof King) {
                         plusIndex += 5;
-                        if(kingState[curPiece.getTeam().ordinal()] == MoveResult.CHECK)
-                        {
+                        if (kingState[curPiece.getTeam().ordinal()] == MoveResult.CHECK) {
                             blankList.get(index).setBackground(kingCheckCol);
-                        }
-                        else if(kingState[curPiece.getTeam().ordinal()] == MoveResult.CHECKMATE)
-                        {
+                        } else if (kingState[curPiece.getTeam().ordinal()] == MoveResult.CHECKMATE) {
                             blankList.get(index).setBackground(kingCheckmateCol);
-                        }
-                        else if(kingState[curPiece.getTeam().ordinal()] == MoveResult.STALEMATE)
-                        {
+                        } else if (kingState[curPiece.getTeam().ordinal()] == MoveResult.STALEMATE) {
                             blankList.get(index).setBackground(stalemateCol);
                         }
                     }
                     blankList.get(index).label.setIcon(pieces[plusIndex]);
-                }
-                else
-                {
+                } else {
                     blankList.get(index).label.setIcon(null);
                 }
                 index++;
@@ -150,10 +129,8 @@ public class MyFrame extends JFrame implements MouseListener, MoveResultListener
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        if (myChess.isPlaying())
-        {
-            if (e.getButton() == MouseEvent.BUTTON1)
-            {
+        if (myChess.isPlaying()) {
+            if (e.getButton() == MouseEvent.BUTTON1) {
                 PieceBlank pieceBlank = (PieceBlank) e.getSource();
                 PieceMove(pieceBlank);
             }
@@ -165,116 +142,81 @@ public class MyFrame extends JFrame implements MouseListener, MoveResultListener
         }
     }
 
-    private void PieceMove(PieceBlank selectedPieceBlank)
-    {
-        if (selectedPiece != null)
-        {
+    private void PieceMove(PieceBlank selectedPieceBlank) {
+        if (selectedPiece != null) {
             Piece curPiece = myChess.getPiece(selectedPieceBlank.posX, selectedPieceBlank.posY);
-            if(curPiece != null)
-            {
-                if(curPiece.getTeam() == selectedPiece.getTeam())
-                {
+            if (curPiece != null) {
+                if (curPiece.getTeam() == selectedPiece.getTeam()) {
                     selectedPiece = curPiece;
                     ShowMoves(selectedPieceBlank);
-                }
-                else
-                {
+                } else {
                     endPos = new Position(selectedPieceBlank.posX, selectedPieceBlank.posY);
                     myChess.move(startPos, endPos);
                 }
-            }
-            else
-            {
+            } else {
                 endPos = new Position(selectedPieceBlank.posX, selectedPieceBlank.posY);
                 myChess.move(startPos, endPos);
             }
-        }
-        else
-        {
+        } else {
             ShowMoves(selectedPieceBlank);
         }
     }
 
-    private void ShowMoves(PieceBlank selectedPieceBlank)
-    {
+    private void ShowMoves(PieceBlank selectedPieceBlank) {
         UpdateFrame();
-        if (myChess.getPiece(selectedPieceBlank.posX, selectedPieceBlank.posY) != null)
-        {
+        if (myChess.getPiece(selectedPieceBlank.posX, selectedPieceBlank.posY) != null) {
             selectedPiece = myChess.getPiece(selectedPieceBlank.posX, selectedPieceBlank.posY);
-            if (selectedPiece.getTeam() == myChess.getTurn())
-            {
+            if (selectedPiece.getTeam() == myChess.getTurn()) {
                 startPos = new Position(selectedPieceBlank.posX, selectedPieceBlank.posY);
                 List<Position> moves = myChess.getPiece(selectedPieceBlank.posX, selectedPieceBlank.posY).getMoves();
                 List<PieceBlank> blanks = new ArrayList<>();
-                for (int i = 0; i < 64; i++)
-                {
+                for (int i = 0; i < 64; i++) {
                     blanks.add((PieceBlank) mainPanel.getComponent(i));
                 }
-                for (int i = 0; i < moves.size(); i++)
-                {
-                    for (int j = 0; j < blanks.size(); j++)
-                    {
-                        if (blanks.get(j).posX == moves.get(i).x && blanks.get(j).posY == moves.get(i).y)
-                        {
-                            if (myChess.getPiece(blanks.get(j).posX, blanks.get(j).posY) == null)
-                            {
+                for (int i = 0; i < moves.size(); i++) {
+                    for (int j = 0; j < blanks.size(); j++) {
+                        if (blanks.get(j).posX == moves.get(i).x && blanks.get(j).posY == moves.get(i).y) {
+                            if (myChess.getPiece(blanks.get(j).posX, blanks.get(j).posY) == null) {
                                 blanks.get(j).setBackground(movePosCol);
-                            }
-                            else
-                            {
+                            } else {
                                 blanks.get(j).setBackground(canKillCol);
                             }
                         }
                     }
                 }
                 selectedPieceBlank.setBackground(selectPieceCol);
-            }
-            else
-            {
+            } else {
                 selectedPiece = null;
             }
         }
     }
 
     @Override
-    public void onMoved(MoveResult result)
-    {
-        if (result == MoveResult.SUCCESS || result == MoveResult.CHECK || result == MoveResult.CHECKMATE || result == MoveResult.STALEMATE)
-        {
+    public void onMoved(MoveResult result) {
+        if (result == MoveResult.SUCCESS || result == MoveResult.CHECK || result == MoveResult.CHECKMATE || result == MoveResult.STALEMATE) {
             startPos = null;
             setTitle("♟ Chess Game ♟ 【 Turn: " + myChess.getTurn().toString() + " 】");
-            if (result != MoveResult.SUCCESS)
-            {
+            if (result != MoveResult.SUCCESS) {
                 List<PieceBlank> blanks = new ArrayList<>();
-                for (int i = 0; i < 64; i++)
-                {
+                for (int i = 0; i < 64; i++) {
                     blanks.add((PieceBlank) mainPanel.getComponent(i));
                 }
-                for (int i = 0; i < blanks.size(); i++)
-                {
+                for (int i = 0; i < blanks.size(); i++) {
                     Piece tempPiece = myChess.getPiece(blanks.get(i).posX, blanks.get(i).posY);
-                    if (tempPiece instanceof King && tempPiece.getTeam() == myChess.getTurn())
-                    {
-                        if (result == MoveResult.CHECK)
-                        {
+                    if (tempPiece instanceof King && tempPiece.getTeam() == myChess.getTurn()) {
+                        if (result == MoveResult.CHECK) {
                             setTitle("♟ Chess Game ♟ 【 Turn: " + myChess.getTurn().toString() + " : CHECK 】");
                             kingState[myChess.getTurn().ordinal()] = MoveResult.CHECK;
-                        }
-                        else if (result == MoveResult.CHECKMATE)
-                        {
+                        } else if (result == MoveResult.CHECKMATE) {
                             kingState[myChess.getTurn().ordinal()] = MoveResult.CHECKMATE;
                             Win();
-                        }
-                        else
-                        {
+                        } else {
                             kingState[myChess.getTurn().ordinal()] = MoveResult.STALEMATE;
                             Draw();
                         }
                     }
                 }
-            }
-            else
-            {
+            } else {
                 kingState[0] = null;
                 kingState[1] = null;
             }
@@ -282,16 +224,13 @@ public class MyFrame extends JFrame implements MouseListener, MoveResultListener
         endPos = null;
         selectedPiece = null;
         UpdateFrame();
-        System.out.println(kingState[0] + ", " + kingState[1]);
     }
 
-    private void Win()
-    {
+    private void Win() {
         setTitle("♟ Chess Game ♟ 【 " + myChess.getTurn().opponent() + " WON : CHECKMATE 】");
     }
 
-    private void Draw()
-    {
+    private void Draw() {
         setTitle("♟ Chess Game ♟ 【 DRAW : STALEMATE 】");
     }
 
