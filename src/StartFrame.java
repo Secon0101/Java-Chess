@@ -180,6 +180,8 @@ public class StartFrame extends JFrame implements ChangeListener {
         {
             newChess.startGame();
         }
+        chessFrame.OpenTab();
+        chessFrame.setVisible(true);
     }
 
     @Override

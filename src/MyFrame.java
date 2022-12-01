@@ -60,11 +60,6 @@ public class MyFrame extends JFrame implements MouseListener, MoveResultListener
             pieces[i] = new ImageIcon(changed);
         }
 
-        setTitle("♟ Chess Game ♟ 【 Turn: " + myChess.getTurn().toString() + " 】");
-        setSize(504, 504);
-        setResizable(false);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
         mainPanel = new JPanel();
         mainPanel.setLayout(new GridLayout(8, 8));
         mainPanel.setBackground(Color.darkGray);
@@ -86,8 +81,16 @@ public class MyFrame extends JFrame implements MouseListener, MoveResultListener
             }
         }
         add(mainPanel);
-        setVisible(true);
 
+    }
+
+    public void OpenTab()
+    {
+        setTitle("♟ Chess Game ♟ 【 Turn: " + myChess.getTurn().toString() + " 】");
+        setSize(504, 504);
+        setResizable(false);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
         UpdateFrame();
     }
 
