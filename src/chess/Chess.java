@@ -1,20 +1,23 @@
 package chess;
 
 import java.util.List;
-import java.util.Random;
 import java.util.LinkedList;
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Chess {
     private final Board board = new Board();
+    /** {@link #move move()}가 완료됐을 때 {@link MoveResult}를 받는 구독자 */
+    private final List<MoveResultListener> moveResultListener = new LinkedList<>();
+    /** ex) {@code isAITeam[Team.BLACK] == true} */
+    private final boolean[] isAITeam = new boolean[Team.values().length];
     
     /** 현재 게임이 플레이 중이라면 {@code true}
      * @see #startGame
-     * @see #startAIGame
      * @see #endGame */
     private boolean playing;
     private Team turn = Team.WHITE;
-    /** ex) {@code isAITeam[Team.BLACK] == true} */
-    private final boolean[] isAITeam = new boolean[Team.values().length];
     
     /** 바로 전 턴에 움직인 말. 앙파상 체크에 사용됨
      *  @see #move */
@@ -23,11 +26,12 @@ public class Chess {
     private final Board tempBoard = new Board();
     /** @see #removeIllegalMoves */
     private final Position tempPos = new Position();
+    
+    /** @see #aiMove() */
     private final List<Piece> aiPieces = new LinkedList<>();
     private final Random rand = new Random();
-    
-    /** {@link #move move()}가 완료됐을 때 {@link MoveResult}를 받는 구독자 */
-    private final List<MoveResultListener> moveResultListener = new LinkedList<>();
+    /** AI 이동 딜레이 */
+    private final Timer timer = new Timer();
     
     
     public Chess() {
@@ -159,9 +163,12 @@ public class Chess {
         // 이동 완료 이벤트 실행
         invokeMovedEvent(result);
         
-        // AI 이동 처리
+        // AI 이동 처리 (0.3초 딜레이)
         if (isAITeam[turn.ordinal()]) {
-            aiMove();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() { aiMove(); }
+            }, 300);
         }
         
         return result;
@@ -231,7 +238,7 @@ public class Chess {
             if (piece == null) continue;
             if (team != null && piece.team != team) continue;
             
-            if (piece.calculateMoves(board) == true) {
+            if (piece.calculateMoves(board)) {
                 check = true;
             }
         }
