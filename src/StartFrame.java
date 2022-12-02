@@ -174,12 +174,9 @@ public class StartFrame extends JFrame implements ChangeListener {
         setVisible(false);
         if(choseCom)
         {
-            newChess.startAIGame(AITeam);
+            newChess.setAI(AITeam);
         }
-        else
-        {
-            newChess.startGame();
-        }
+        newChess.startGame();
         chessFrame.OpenTab();
         chessFrame.setVisible(true);
     }

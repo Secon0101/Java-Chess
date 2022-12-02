@@ -14,7 +14,7 @@ public class Chess {
     private boolean playing;
     private Team turn = Team.WHITE;
     /** ex) {@code isAITeam[Team.BLACK] == true} */
-    private final boolean[] isAITeam = new boolean[2];
+    private final boolean[] isAITeam = new boolean[Team.values().length];
     
     /** 바로 전 턴에 움직인 말. 앙파상 체크에 사용됨
      *  @see #move */
@@ -52,35 +52,26 @@ public class Chess {
     }
     
     
-    /** 로컬 멀티플레이(2인용) 게임을 시작한다. 이후로 {@link #move move()} 메서드를 사용할 수 있다. 백 팀(아래쪽)이 선공한다.
-     * @see #startAIGame */
+    /** 인자로 들어온 팀들을 AI로 정한다. */
+    public void setAI(Team... teams) {
+        for (int i = 0; i < isAITeam.length && i < teams.length; i++) {
+            isAITeam[teams[i].ordinal()] = true;
+        }
+    }
+    
+    /** 게임을 시작한다. 이후로 {@link #move move()} 메서드를 사용할 수 있다. 백 팀(아래쪽)이 선공한다.
+     * <p> {@link #setAI(Team...)} 메서드를 먼저 사용하면 AI를 넣어서 플레이할 수 있다. </p> */
     public void startGame() {
         startGame(Team.WHITE);
     }
     /** 로컬 멀티플레이(2인용) 게임을 시작한다. 이후로 {@link #move move()} 메서드를 사용할 수 있다.
-     * @param firstTurn 선공하는 팀
-     * @see #startAIGame */
+     * <p> {@link #setAI(Team...)} 메서드를 먼저 사용하면 AI를 넣어서 플레이할 수 있다. </p>
+     * @param firstTurn 선공하는 팀 */
     public void startGame(Team firstTurn) {
         turn = firstTurn;
         playing = true;
-    }
-    
-    /** AI 대전(1인용) 게임을 시작한다. 이후로 {@link #move move()} 메서드를 사용할 수 있다. 백 팀(아래쪽)이 선공한다.
-     * @param aiTeam AI의 팀. 반대편은 자동적으로 플레이어 팀이 된다.
-     * @see #startGame() */
-    public void startAIGame(Team aiTeam) {
-        startAIGame(aiTeam, Team.WHITE);
-    }
-    /** AI 대전(1인용) 게임을 시작한다. 이후로 {@link #move move()} 메서드를 사용할 수 있다.
-     * @param aiTeam AI의 팀. 반대편은 자동적으로 플레이어 팀이 된다.
-     * @param firstTurn 선공하는 팀
-     * @see #startGame() */
-    public void startAIGame(Team aiTeam, Team firstTurn) {
-        turn = firstTurn;
-        isAITeam[aiTeam.ordinal()] = true;
-        playing = true;
         
-        if (turn == aiTeam) {
+        if (isAITeam[turn.ordinal()]) {
             aiMove();
         }
     }
@@ -232,7 +223,7 @@ public class Chess {
     /** 주어진 판 위에 있는 모든 말들의 현재 이동 가능 위치를 계산해서, 그 말에 저장해 놓는다. 특정한 팀만 계산할 수도 있다.
      * <p> 하는 김에 체크 여부도 계산한다. </p>
      * @param board 계산할 보드
-     * @param team 계산할 팀. null이면 모든 팀 계산
+     * @param team 계산할 팀. {@code null}이면 모든 팀 계산
      * @return 체크 여부 */
     private boolean calculateMoves(Board board, Team team) {
         boolean check = false;
