@@ -2,3 +2,5 @@
 out/
 .vscode/
 *.iml
+*.zip
+res/META-INF/
