@@ -30,18 +30,19 @@ public class MyFrame extends JFrame implements MouseListener, MoveResultListener
     List<PieceBlank> blankList = new ArrayList<>();
 
     public void SetIcons() {
-        pieces[0] = new ImageIcon("res/images/PB.png");
-        pieces[1] = new ImageIcon("res/images/RB.png");
-        pieces[2] = new ImageIcon("res/images/NB.png");
-        pieces[3] = new ImageIcon("res/images/BB.png");
-        pieces[4] = new ImageIcon("res/images/QB.png");
-        pieces[5] = new ImageIcon("res/images/KB.png");
-        pieces[6] = new ImageIcon("res/images/PW.png");
-        pieces[7] = new ImageIcon("res/images/RW.png");
-        pieces[8] = new ImageIcon("res/images/NW.png");
-        pieces[9] = new ImageIcon("res/images/BW.png");
-        pieces[10] = new ImageIcon("res/images/QW.png");
-        pieces[11] = new ImageIcon("res/images/KW.png");
+        var resLoader = getClass().getClassLoader();
+        pieces[0] = new ImageIcon(resLoader.getResource("images/PB.png"));
+        pieces[1] = new ImageIcon(resLoader.getResource("images/RB.png"));
+        pieces[2] = new ImageIcon(resLoader.getResource("images/NB.png"));
+        pieces[3] = new ImageIcon(resLoader.getResource("images/BB.png"));
+        pieces[4] = new ImageIcon(resLoader.getResource("images/QB.png"));
+        pieces[5] = new ImageIcon(resLoader.getResource("images/KB.png"));
+        pieces[6] = new ImageIcon(resLoader.getResource("images/PW.png"));
+        pieces[7] = new ImageIcon(resLoader.getResource("images/RW.png"));
+        pieces[8] = new ImageIcon(resLoader.getResource("images/NW.png"));
+        pieces[9] = new ImageIcon(resLoader.getResource("images/BW.png"));
+        pieces[10] = new ImageIcon(resLoader.getResource("images/QW.png"));
+        pieces[11] = new ImageIcon(resLoader.getResource("images/KW.png"));
     }
 
     public void SetColor(Color colorA, Color colorB)
